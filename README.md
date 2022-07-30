@@ -27,9 +27,21 @@ lix download
 lime test html5
 ```
 
+edit `TestMain.hx`
+and change commented out lines to:
+
+```haxe
+  // lime test html5
+  var driver = new AppDriver("localhost", 9999, null);
+
+  // lime build linux
+  // new AppDriver("localhost", 9999, new AppRestarter("./Main", [], "build/openfl/linux/bin"));
+```
+
 in second window run
 
 ```bash
+cd samples/haxeui/button
 haxe build.hxml
 bin/TestMain
 ```
