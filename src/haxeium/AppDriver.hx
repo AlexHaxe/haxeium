@@ -8,8 +8,6 @@ import hx.ws.SocketImpl;
 import hx.ws.Types.MessageType;
 import hx.ws.WebSocketHandler;
 import hx.ws.WebSocketServer;
-import json2object.JsonParser;
-import json2object.JsonWriter;
 import utest.Assert;
 import haxeium.elements.DropDownElement;
 import haxeium.elements.Element;

@@ -5,22 +5,16 @@ import haxe.Json;
 import haxe.Timer;
 import hx.ws.Types.MessageType;
 import hx.ws.WebSocket;
-import json2object.JsonParser;
-import json2object.JsonWriter;
 
 abstract class DriverBase<T> {
 	var socket:WebSocket;
 	var components:Array<T>;
-	var parser:JsonParser<CommandBase>;
-	var writer:JsonWriter<ResultBase>;
 
 	var url:String;
 
 	public function new(url:String) {
 		components = [];
 		this.url = url;
-		parser = new JsonParser<CommandBase>();
-		writer = new JsonWriter<ResultBase>();
 		start();
 	}
 
