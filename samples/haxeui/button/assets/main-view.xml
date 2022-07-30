@@ -1,0 +1,73 @@
+<vbox style="padding: 5px;">
+    <style>
+        .button {
+            font-size: 24px;
+        }
+    </style>
+    <hbox>
+        <button text="Click Me!" id="button1" style="color: red;" />
+        <button text="Click Me!" id="button2" style="color: green;" />
+        <button text="Click Me!" onclick="this.text='Thanks!'" style="color: blue;" />
+    </hbox>
+    <hbox>
+        <vbox>
+            <button text="Click Me!" style="font-size: 24px;" />
+            <slider pos="33" />
+            <progress pos="66" />
+            <hbox>
+                <button text="Button" />
+                <button text="Button" />
+                <dropdown selectedIndex="1">
+                    <data>
+                        <item text="Item 1" />
+                        <item text="Item 2" />
+                        <item text="Item 3" />
+                        <item text="Item 4" />
+                    </data>
+                </dropdown>
+            </hbox>
+            <grid columns="3">
+                <button text="Button" />
+                <button text="Button" onclick="this.text='Thanks!'" />
+                <button text="Button" onclick="this.text='Thanks!'"  />
+                <button text="Button" />
+                <button text="Button" />
+                <button text="Button" />
+            </grid>
+        </vbox>
+
+        <dropdown text="Select Item" id="dropdown1">
+            <data>
+                <item text="Item 1" />
+                <item text="Item 2" />
+                <item text="Item 3" />
+                <item text="Item 4" />
+                <item text="Item 5" />
+                <item text="Item 6" />
+                <item text="Item 7" />
+                <item text="Item 8" />
+                <item text="Item 9" />
+            </data>
+        </dropdown>
+        <slider direction="vertical" pos="33" />
+        <progress direction="vertical" pos="66" />
+    </hbox>
+
+	<hbox width="100%">
+        <vbox width="100%">
+			<tabview id="tv1" width="100%" height="200">
+				<box text="Page" icon="haxeui-core/styles/default/haxeui_tiny.png">
+					<button text="Page 1" />
+				</box>
+				<box text="Page" icon="haxeui-core/styles/default/haxeui_tiny.png">
+					<button text="Page 2" />
+				</box>
+				<box text="Page" icon="haxeui-core/styles/default/haxeui_tiny.png" disabled="true">
+					<button text="Page 3" />
+				</box>
+			</tabview>
+        </vbox>
+    </hbox>
+
+
+</vbox>

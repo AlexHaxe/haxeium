@@ -1,0 +1,14 @@
+-cp src
+-cp tests
+
+--lib haxeium
+--lib json2object
+--lib hxWebSockets
+--lib utest
+
+-D threaded_server
+-D threaded_handlers
+
+--cpp bin
+
+--main TestMain

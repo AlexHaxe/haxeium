@@ -1,0 +1,17 @@
+{
+	"name": "haxeium",
+	"url": "https://github.com/AlexHaxe/haxeium",
+	"license": "MIT",
+	"tags": [
+		"testing",
+		"ui-test"
+	],
+	"description": "an automated ui-testing framework for Haxe",
+	"version": "1.0.0",
+	"releasenote": "initial version - see CHANGELOG",
+	"contributors": [
+		"AlexHaxe"
+	],
+	"dependencies": {},
+	"classPath": "src"
+}

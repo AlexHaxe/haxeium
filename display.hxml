@@ -1,0 +1,7 @@
+-cp src
+
+-lib haxeui-core
+-lib hxWebSockets
+-lib utest
+
+-js out.js
