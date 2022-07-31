@@ -4,6 +4,7 @@ import haxe.Exception;
 import haxe.Json;
 import haxe.Timer;
 import haxe.ui.core.Component;
+import haxe.ui.core.InteractiveComponent;
 import haxe.ui.core.Screen;
 import haxe.ui.events.MouseEvent;
 import haxe.ui.styles.elements.RuleElement;
@@ -88,6 +89,16 @@ class HaxeUIDriver extends DriverBase<Component> {
 		return results;
 	}
 
+	function doFindElementsUnderPoint(command:CommandFindElementsUnderPoint):ResultBase {
+		var components = Screen.instance.findComponentsUnderPoint(command.x, command.y);
+		var results:ResultFindElements = cast success(command.locator);
+		results.elements = [];
+		for (component in components) {
+			results.elements.push({locator: getComponentLocator(component), className: component.className});
+		}
+		return results;
+	}
+
 	function doFindChildren(command:CommandFindChildren):ResultBase {
 		var parentComponent:Component = findComponent(elementToByLocator(command.locator));
 		if (parentComponent == null) {
@@ -102,7 +113,6 @@ class HaxeUIDriver extends DriverBase<Component> {
 		return results;
 	}
 
-	@:access(haxe.ui.core.Component)
 	function doMouseEvent(command:CommandMouseEvent):ResultBase {
 		var component:Component = findComponent(elementToByLocator(command.locator));
 		if (component == null) {
@@ -114,6 +124,23 @@ class HaxeUIDriver extends DriverBase<Component> {
 		if (component.disabled) {
 			return disabled(command.locator);
 		}
+
+		var x = (component.screenLeft + component.width) / 2;
+		var y = (component.screenTop + component.height) / 2;
+		var components = Screen.instance.findComponentsUnderPoint(x, y);
+		if (components.length <= 0) {
+			return disabled(command.locator);
+		}
+		var componentUnderPoint = component;
+		for (comp in components) {
+			if (comp is InteractiveComponent) {
+				componentUnderPoint = comp;
+			}
+		}
+		if (componentUnderPoint != component) {
+			return notVisible(command.locator);
+		}
+
 		// if (!component.hasEvent(command.eventName)) {
 		// 	return disabled(command.locator);
 		// }
@@ -124,7 +151,6 @@ class HaxeUIDriver extends DriverBase<Component> {
 		} catch (e:Exception) {
 			return error(command.locator, e.message);
 		}
-
 		return success(command.locator);
 	}
 

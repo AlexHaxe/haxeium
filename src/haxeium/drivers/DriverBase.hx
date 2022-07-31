@@ -3,6 +3,8 @@ package haxeium.drivers;
 import haxe.Exception;
 import haxe.Json;
 import haxe.Timer;
+import haxe.extern.EitherType;
+import haxe.io.Bytes;
 import hx.ws.Types.MessageType;
 import hx.ws.WebSocket;
 
@@ -41,11 +43,14 @@ abstract class DriverBase<T> {
 	function onMessage(message:MessageType) {
 		switch (message) {
 			case BytesMessage(content):
-				trace(content);
 			case StrMessage(content):
 				var result = runCommand(Json.parse(content));
 				if (result != null) {
-					socket.send(Json.stringify(result));
+					if (result is Bytes) {
+						socket.send(result);
+					} else {
+						socket.send(Json.stringify(result));
+					}
 				}
 		}
 	}
@@ -56,12 +61,14 @@ abstract class DriverBase<T> {
 		Timer.delay(start, 500);
 	}
 
-	function runCommand(command:CommandBase):Null<ResultBase> {
+	function runCommand(command:CommandBase):Null<EitherType<ResultBase, Bytes>> {
 		switch (command.command) {
 			case FindElement:
 				return doFindElement(cast command);
 			case FindElements:
 				return doFindElements(cast command);
+			case FindElementsUnderPoint:
+				return doFindElementsUnderPoint(cast command);
 			case FindChildren:
 				return doFindChildren(cast command);
 			case MouseEvent:
@@ -73,6 +80,8 @@ abstract class DriverBase<T> {
 			case Restart:
 				doRestart(command);
 				return null;
+			case ScreenGrab:
+				return doScreenGrab(cast command);
 		}
 		return notFound(command.locator);
 	}
@@ -90,9 +99,22 @@ abstract class DriverBase<T> {
 
 	abstract function doFindElements(command:CommandFindElements):ResultBase;
 
+	abstract function doFindElementsUnderPoint(command:CommandFindElementsUnderPoint):ResultBase;
+
 	abstract function doFindChildren(command:CommandFindChildren):ResultBase;
 
 	abstract function doMouseEvent(command:CommandMouseEvent):ResultBase;
+
+	function doScreenGrab(command:CommandMouseEvent):EitherType<ResultBase, Bytes> {
+		#if openfl
+		var stage = openfl.Lib.current.stage;
+		var bitmapData = new openfl.display.BitmapData(stage.stageWidth, stage.stageHeight);
+		bitmapData.draw(stage);
+		var bytes:Bytes = bitmapData.encode(new openfl.geom.Rectangle(0, 0, stage.stageWidth, stage.stageHeight), new openfl.display.PNGEncoderOptions());
+		return bytes;
+		#end
+		return unsupported(command.locator);
+	}
 
 	function doPropSet(command:CommandPropSet):ResultBase {
 		var component = findComponent(elementToByLocator(command.locator));

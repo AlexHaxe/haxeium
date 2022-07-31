@@ -2,6 +2,8 @@ package haxeium;
 
 import haxe.Json;
 import haxe.MainLoop;
+import haxe.extern.EitherType;
+import haxe.io.Bytes;
 import sys.io.File;
 import sys.thread.Thread;
 import hx.ws.SocketImpl;
@@ -118,6 +120,17 @@ class AppDriver {
 		return result.elements.map((element) -> createElement(element.locator, element.className));
 	}
 
+	public function screenGrab(fileName:String):Bool {
+		var command:CommandScreenGrab = {command: ScreenGrab, locator: byToElementLocator(ById(""))};
+
+		var result:Null<Bytes> = cast send(command);
+		if (result == null) {
+			return false;
+		}
+		File.saveBytes(fileName, result);
+		return true;
+	}
+
 	function createElement(locator:ElementLocator, className:String):Element {
 		var byLocator = elementToByLocator(locator);
 		return switch (className) {
@@ -177,11 +190,12 @@ class AppDriver {
 			return null;
 		}
 		var waitCounter = 0;
-		var result:ResultBase = null;
+		var result:Null<EitherType<ResultBase, Bytes>> = null;
 		handler.onmessage = function(message:MessageType) {
 			switch (message) {
 				case BytesMessage(content):
-					logger(content.readAllAvailableBytes().toString());
+					result = content.readAllAvailableBytes();
+					logger('<< binary data (${(result : Bytes).length})');
 				case StrMessage(content):
 					result = Json.parse(content);
 					logger('<< $result');
@@ -227,6 +241,8 @@ class AppDriver {
 				'findElement(${locatorToText(cmd.locator)})';
 			case FindElements:
 				'findElements(${locatorToText(cmd.locator)})';
+			case FindElementsUnderPoint:
+				'findElementsUnderPoint(${locatorToText(cmd.locator)})';
 			case FindChildren:
 				'findChildren(${locatorToText(cmd.locator)})';
 			case MouseEvent:
@@ -245,6 +261,8 @@ class AppDriver {
 				'propSet(${locatorToText(cmd.locator)})';
 			case Restart:
 				"restart";
+			case ScreenGrab:
+				"screenGrab";
 		}
 		switch (result.status) {
 			case null:
