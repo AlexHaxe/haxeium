@@ -7,7 +7,7 @@
 
 -D threaded_server
 -D threaded_handlers
--D linux
+-D html5
 
 --cpp bin
 
