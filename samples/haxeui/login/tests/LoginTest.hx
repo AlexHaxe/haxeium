@@ -1,3 +1,4 @@
+import haxeium.Wait;
 import haxeium.elements.Element;
 import haxeium.test.TestBaseAllRestarts;
 import utest.Assert;
@@ -8,6 +9,8 @@ class LoginTest extends TestBaseAllRestarts {
 		Assert.equals("Login", button.text);
 		button.click();
 
+		Wait.untilElementBecomesAvailable(ById("username"));
+
 		// should not be clickable when there is a modal dialog
 		button.click(expectNotVisibleResult);
 	}
@@ -16,6 +19,8 @@ class LoginTest extends TestBaseAllRestarts {
 		var button = driver.findElement(ById("loginButton"));
 		Assert.equals("Login", button.text);
 		button.click();
+
+		Wait.untilElementBecomesAvailable(ById("username"));
 
 		var username = driver.findElement(ById("username"));
 
