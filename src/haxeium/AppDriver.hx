@@ -63,7 +63,7 @@ class AppDriver {
 	}
 
 	public function stopApp() {
-		var command:CommandRestart = {command: Restart, locator: byToElementLocator(ById(""))};
+		var command:CommandRestart = {command: Restart};
 		send(command, false);
 		connected = false;
 		if (handler != null) {
@@ -121,7 +121,7 @@ class AppDriver {
 	}
 
 	public function screenGrab(fileName:String):Bool {
-		var command:CommandScreenGrab = {command: ScreenGrab, locator: byToElementLocator(ById(""))};
+		var command:CommandScreenGrab = {command: ScreenGrab};
 
 		var result:Null<Bytes> = cast send(command);
 		if (result == null) {
@@ -236,29 +236,54 @@ class AppDriver {
 	}
 
 	function logTransmission(cmd:CommandBase, result:Null<ResultBase>) {
+		var cmdLocator:CommandLocatorBase = cast cmd;
 		var text = switch (cmd.command) {
 			case FindElement:
-				'findElement(${locatorToText(cmd.locator)})';
+				'findElement(${locatorToText(cmdLocator.locator)})';
 			case FindElements:
-				'findElements(${locatorToText(cmd.locator)})';
+				'findElements(${locatorToText(cmdLocator.locator)})';
 			case FindElementsUnderPoint:
-				'findElementsUnderPoint(${locatorToText(cmd.locator)})';
+				'findElementsUnderPoint(${locatorToText(cmdLocator.locator)})';
 			case FindChildren:
-				'findChildren(${locatorToText(cmd.locator)})';
+				'findChildren(${locatorToText(cmdLocator.locator)})';
+			case KeyboardEvent:
+				var cmdKeyboard:CommandKeyboardEvent = cast cmd;
+				switch (cmdKeyboard.eventName) {
+					case KeyPress:
+						'keyPress(${cmdKeyboard.text})';
+					case KeyDown:
+						'keyDown(${cmdKeyboard.text})';
+					case KeyUp:
+						'keyUp(${cmdKeyboard.text})';
+				}
 			case MouseEvent:
 				var cmdMouse:CommandMouseEvent = cast cmd;
 				switch (cmdMouse.eventName) {
 					case Click:
-						'click(${locatorToText(cmd.locator)})';
+						'click(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
 					case MouseDown:
-						'mouseDown(${locatorToText(cmd.locator)})';
+						'mouseDown(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
 					case MouseUp:
-						'mouseUp(${locatorToText(cmd.locator)})';
+						'mouseUp(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
+					case DoubleClick:
+						'doubleClick(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
+					case MouseOver:
+						'mouseOver(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
+					case MouseOut:
+						'mouseOut(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
+					case MouseWheel:
+						'mouseWheel(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
+					case RightClick:
+						'rightClick(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
+					case RightMouseDown:
+						'rightMouseDown(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
+					case RightMouseUp:
+						'rightMouseUp(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
 				}
 			case PropGet:
-				'propGet(${locatorToText(cmd.locator)})';
+				'propGet(${locatorToText(cmdLocator.locator)})';
 			case PropSet:
-				'propSet(${locatorToText(cmd.locator)})';
+				'propSet(${locatorToText(cmdLocator.locator)})';
 			case Restart:
 				"restart";
 			case ScreenGrab:
@@ -275,9 +300,9 @@ class AppDriver {
 			case FailedDisabled:
 				text = "failed: disabled - " + text;
 			case FailedNotFound:
-				text = " - failed: not found - " + text;
+				text = "failed: not found - " + text;
 			case FailedNotVisible:
-				text = " - failed: not visible - " + text;
+				text = "failed: not visible - " + text;
 			case FailedReadOnly:
 				text = "failed: readonly - " + text;
 			case Unsupported:

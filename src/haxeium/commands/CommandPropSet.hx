@@ -1,6 +1,6 @@
 package haxeium.commands;
 
-typedef CommandPropSet = CommandBase & {
+typedef CommandPropSet = CommandLocatorBase & {
 	var name:String;
 	var value:Any;
 }

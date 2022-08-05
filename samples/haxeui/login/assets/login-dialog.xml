@@ -1,0 +1,9 @@
+<dialog width="400" title="Login">
+    <grid width="100%">
+        <label text="Username" verticalAlign="center" />
+        <textfield id="username" width="100%" />
+
+        <label text="Password" verticalAlign="center" />
+        <textfield id="password" password="true" width="100%" />
+    </grid>
+</dialog>

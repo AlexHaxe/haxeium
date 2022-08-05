@@ -2,6 +2,6 @@ package haxeium.commands;
 
 import haxeium.commands.ElementLocator;
 
-typedef CommandFindElement = CommandBase & {
+typedef CommandFindElement = CommandLocatorBase & {
 	@:optional var parent:ElementLocator;
 }

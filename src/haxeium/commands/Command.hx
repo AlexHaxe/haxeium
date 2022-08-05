@@ -6,6 +6,7 @@ enum abstract Command(String) {
 	var FindElementsUnderPoint = "findElementsUnderPoint";
 	var FindChildren = "findChildren";
 	var MouseEvent = "mouseEvent";
+	var KeyboardEvent = "keyboardEvent";
 	var PropGet = "propGet";
 	var PropSet = "propSet";
 	var Restart = "restart";

@@ -1,3 +1,3 @@
 package haxeium.commands;
 
-typedef CommandFindChildren = CommandBase & {}
+typedef CommandFindChildren = CommandLocatorBase & {}

@@ -2,7 +2,7 @@ package haxeium.commands;
 
 typedef ResultBase = {
 	var status:ResultStatus;
-	var locator:ElementLocator;
+	@:optional var locator:ElementLocator;
 }
 
 enum abstract ResultStatus(String) {

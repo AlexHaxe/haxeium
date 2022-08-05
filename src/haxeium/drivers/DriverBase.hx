@@ -71,6 +71,8 @@ abstract class DriverBase<T> {
 				return doFindElementsUnderPoint(cast command);
 			case FindChildren:
 				return doFindChildren(cast command);
+			case KeyboardEvent:
+				return doKeyboardEvent(cast command);
 			case MouseEvent:
 				return doMouseEvent(cast command);
 			case PropSet:
@@ -81,9 +83,9 @@ abstract class DriverBase<T> {
 				doRestart(command);
 				return null;
 			case ScreenGrab:
-				return doScreenGrab(cast command);
+				return doScreenGrab(command);
 		}
-		return notFound(command.locator);
+		return notFound();
 	}
 
 	function getComponentLocator(component:T):ElementLocator {
@@ -105,7 +107,9 @@ abstract class DriverBase<T> {
 
 	abstract function doMouseEvent(command:CommandMouseEvent):ResultBase;
 
-	function doScreenGrab(command:CommandMouseEvent):EitherType<ResultBase, Bytes> {
+	abstract function doKeyboardEvent(command:CommandKeyboardEvent):ResultBase;
+
+	function doScreenGrab(command:CommandBase):EitherType<ResultBase, Bytes> {
 		#if openfl
 		var stage = openfl.Lib.current.stage;
 		var bitmapData = new openfl.display.BitmapData(stage.stageWidth, stage.stageHeight);
@@ -113,7 +117,7 @@ abstract class DriverBase<T> {
 		var bytes:Bytes = bitmapData.encode(new openfl.geom.Rectangle(0, 0, stage.stageWidth, stage.stageHeight), new openfl.display.PNGEncoderOptions());
 		return bytes;
 		#end
-		return unsupported(command.locator);
+		return unsupported();
 	}
 
 	function doPropSet(command:CommandPropSet):ResultBase {
@@ -141,16 +145,16 @@ abstract class DriverBase<T> {
 		socket.close();
 		#if js
 		js.Browser.location.reload(true);
-		return success(command.locator);
+		return success();
 		#else
 		Sys.exit(0);
-		return unsupported(command.locator);
+		return unsupported();
 		#end
 	}
 
 	abstract function findComponent(locator:ByLocator, ?parent:ByLocator):T;
 
-	function success(locator:ElementLocator):ResultBase {
+	function success(?locator:ElementLocator):ResultBase {
 		return {
 			status: Success,
 			locator: locator
@@ -172,7 +176,7 @@ abstract class DriverBase<T> {
 		};
 	}
 
-	function notFound(locator:ElementLocator):ResultBase {
+	function notFound(?locator:ElementLocator):ResultBase {
 		return {
 			status: FailedNotFound,
 			locator: locator
@@ -186,10 +190,9 @@ abstract class DriverBase<T> {
 		};
 	}
 
-	function unsupported(locator:ElementLocator):ResultBase {
+	function unsupported():ResultBase {
 		return {
-			status: Unsupported,
-			locator: locator
+			status: Unsupported
 		};
 	}
 }

@@ -1,6 +1,6 @@
 package haxeium.commands;
 
-typedef CommandFindElementsUnderPoint = CommandBase & {
+typedef CommandFindElementsUnderPoint = CommandLocatorBase & {
 	var x:Float;
 	var y:Float;
 }

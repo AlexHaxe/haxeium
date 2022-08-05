@@ -6,6 +6,7 @@ import haxe.Timer;
 import haxe.ui.core.Component;
 import haxe.ui.core.InteractiveComponent;
 import haxe.ui.core.Screen;
+import haxe.ui.events.KeyboardEvent;
 import haxe.ui.events.MouseEvent;
 import haxe.ui.styles.elements.RuleElement;
 import hx.ws.Types.MessageType;
@@ -113,8 +114,47 @@ class HaxeUIDriver extends DriverBase<Component> {
 		return results;
 	}
 
+	@:access(haxe.ui.core.Component)
+	function findInteractiveComponent(x:Float, y:Float):Null<Component> {
+		var components = Screen.instance.findComponentsUnderPoint(x, y);
+		if (components.length <= 0) {
+			return null;
+		}
+		var componentUnderPoint:Null<Component> = null;
+		for (comp in components) {
+			if (comp.id == "modal-background") {
+				return comp;
+			}
+			if (comp is InteractiveComponent) {
+				return comp;
+			}
+			if (comp.onClick != null || comp.hasEvent(MouseEvent.RIGHT_CLICK)) {
+				return comp;
+			}
+		}
+		return null;
+	}
+
 	function doMouseEvent(command:CommandMouseEvent):ResultBase {
-		var component:Component = findComponent(elementToByLocator(command.locator));
+		var component:Component;
+		if (command.x != null && command.y != null) {
+			component = findInteractiveComponent(command.x, command.y);
+		} else {
+			component = cast findComponent(elementToByLocator(command.locator));
+			if (component == null) {
+				return notFound(command.locator);
+			}
+
+			var x = component.screenLeft + component.width / 2;
+			var y = component.screenTop + component.height / 2;
+			var componentUnderPoint = findInteractiveComponent(x, y);
+			if (componentUnderPoint == null) {
+				return notVisible(command.locator);
+			}
+			if (componentUnderPoint != component) {
+				return notVisible(command.locator);
+			}
+		}
 		if (component == null) {
 			return notFound(command.locator);
 		}
@@ -123,22 +163,6 @@ class HaxeUIDriver extends DriverBase<Component> {
 		}
 		if (component.disabled) {
 			return disabled(command.locator);
-		}
-
-		var x = (component.screenLeft + component.width) / 2;
-		var y = (component.screenTop + component.height) / 2;
-		var components = Screen.instance.findComponentsUnderPoint(x, y);
-		if (components.length <= 0) {
-			return disabled(command.locator);
-		}
-		var componentUnderPoint = component;
-		for (comp in components) {
-			if (comp is InteractiveComponent) {
-				componentUnderPoint = comp;
-			}
-		}
-		if (componentUnderPoint != component) {
-			return notVisible(command.locator);
 		}
 
 		// if (!component.hasEvent(command.eventName)) {
@@ -152,6 +176,69 @@ class HaxeUIDriver extends DriverBase<Component> {
 			return error(command.locator, e.message);
 		}
 		return success(command.locator);
+	}
+
+	function doKeyboardEvent(command:CommandKeyboardEvent):ResultBase {
+		if (command.text.length <= 0) {
+			return success(command.locator);
+		}
+		var component = null;
+		if (command.locator != null) {
+			component = findComponent(elementToByLocator(command.locator));
+			if (component == null) {
+				return notFound(command.locator);
+			}
+
+			var x = component.screenLeft + component.width / 2;
+			var y = component.screenTop + component.height / 2;
+			var componentUnderPoint = findInteractiveComponent(x, y);
+			if (componentUnderPoint == null) {
+				return notVisible(command.locator);
+			}
+			if (componentUnderPoint != component) {
+				return notVisible(command.locator);
+			}
+			if (component.hidden) {
+				return notVisible(command.locator);
+			}
+			if (component.disabled) {
+				return disabled(command.locator);
+			}
+		}
+		var eventName = command.eventName;
+		function dispatchEvent(keyCode:Int) {
+			var event = new KeyboardEvent(eventName);
+
+			event.keyCode = keyCode;
+			event.altKey = command.altKey;
+			event.ctrlKey = command.ctrlKey;
+			event.shiftKey = command.shiftKey;
+			if (component != null) {
+				event.target = component;
+				component.dispatch(event);
+			} else {
+				if (Screen.instance.rootComponents.length <= 0) {
+					return;
+				}
+				Screen.instance.rootComponents[Screen.instance.rootComponents.length - 1].dispatch(event);
+			}
+		}
+		try {
+			switch (command.eventName) {
+				case KeyPress:
+					for (index in 0...command.text.length) {
+						eventName = KeyDown;
+						dispatchEvent(command.text.charCodeAt(index));
+						eventName = KeyUp;
+						dispatchEvent(command.text.charCodeAt(index));
+					}
+				case KeyDown | KeyUp:
+					dispatchEvent(command.text.charCodeAt(0));
+			}
+			return success(command.locator);
+		} catch (e:Exception) {
+			return error(command.locator, e.message);
+		}
 	}
 
 	override function doPropGet(command:CommandPropGet):ResultPropGet {

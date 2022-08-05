@@ -5,6 +5,8 @@ import haxeium.commands.CommandFindChildren;
 import haxeium.commands.CommandFindElement;
 import haxeium.commands.CommandFindElements;
 import haxeium.commands.CommandFindElementsUnderPoint;
+import haxeium.commands.CommandKeyboardEvent;
+import haxeium.commands.CommandLocatorBase;
 import haxeium.commands.CommandMouseEvent;
 import haxeium.commands.CommandPropGet;
 import haxeium.commands.CommandPropSet;

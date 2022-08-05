@@ -1,0 +1,5 @@
+<vbox style="padding: 5px;">
+    <hbox>
+        <button text="Login" id="loginButton" />
+    </hbox>
+</vbox>
