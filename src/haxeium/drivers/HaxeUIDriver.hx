@@ -247,7 +247,9 @@ class HaxeUIDriver extends DriverBase<Component> {
 			return result;
 		}
 		if (result.value is Component) {
-			result.value = getComponentLocator(result.value);
+			var component = cast result.value;
+			result.value = getComponentLocator(component);
+			result.className = component.className;
 		}
 		return result;
 	}

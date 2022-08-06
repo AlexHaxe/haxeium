@@ -14,6 +14,7 @@ import utest.Assert;
 import haxeium.elements.DropDownElement;
 import haxeium.elements.Element;
 import haxeium.elements.NoSuchElementException;
+import haxeium.elements.TabBarButtonElement;
 
 class AppDriver {
 	static final RESPONSE_WAIT_TIME:Float = 0.01;
@@ -77,8 +78,8 @@ class AppDriver {
 		}
 	}
 
-	public function findElement(locator:ByLocator, ?parent:ElementLocator):Null<Element> {
-		var command:CommandFindElement = {command: FindElement, locator: byToElementLocator(locator), parent: parent};
+	public function findElement(locator:ByLocator, ?parent:ByLocator):Null<Element> {
+		var command:CommandFindElement = {command: FindElement, locator: byToElementLocator(locator), parent: byToElementLocator(parent)};
 
 		var result:ResultFindElement = cast send(command);
 		if (result == null) {
@@ -131,11 +132,13 @@ class AppDriver {
 		return true;
 	}
 
-	function createElement(locator:ElementLocator, className:String):Element {
+	public static function createElement(locator:ElementLocator, className:String):Element {
 		var byLocator = elementToByLocator(locator);
 		return switch (className) {
 			case "haxe.ui.components.DropDown":
 				new DropDownElement(byLocator);
+			case "haxe.ui.components._TabBar.TabBarButton":
+				new TabBarButtonElement(byLocator);
 			default:
 				new Element(byLocator);
 		}

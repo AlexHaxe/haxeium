@@ -101,7 +101,7 @@ class Element {
 			if (Reflect.hasField(locatorValue, "type")
 				&& Reflect.hasField(locatorValue, "location")
 				&& '${locatorValue.type}'.startsWith("By")) {
-				return elementToByLocator(locatorValue);
+				return AppDriver.createElement(locatorValue, result.className);
 			}
 		}
 		return result.value;
@@ -124,6 +124,18 @@ class Element {
 		}
 		handler('setProp "$name"', result.status);
 		return result.value;
+	}
+
+	public function children():Array<Element> {
+		return AppDriver.instance.findChildren(locator);
+	}
+
+	public function findElement(loc:ByLocator):Element {
+		return AppDriver.instance.findElement(loc, locator);
+	}
+
+	public function findElements(loc:ByLocator):Array<Element> {
+		return AppDriver.instance.findElements(loc, locator);
 	}
 }
 
