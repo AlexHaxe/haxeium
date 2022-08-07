@@ -78,15 +78,23 @@ class AppDriver {
 		}
 	}
 
-	public function findElement(locator:ByLocator, ?parent:ByLocator):Null<Element> {
+	public function findElement(locator:ByLocator, ?parent:ByLocator, ?handler:ResultStatusHandler):Null<Element> {
 		var command:CommandFindElement = {command: FindElement, locator: byToElementLocator(locator), parent: byToElementLocator(parent)};
 
 		var result:ResultFindElement = cast send(command);
 		if (result == null) {
 			throw new NoSuchElementException(locator);
 		}
-		if (result.status != Success) {
+		if (handler == null) {
+			handler = expectSuccessResult;
+		}
+		if (!handler("findElement", result.status)) {
 			throw new NoSuchElementException(locator);
+		}
+		if (result.status != Success) {
+			// handler may allow e.g. FailedNotFound because a test expects an element to not exist,
+			// but we don't want an Element instance for anything other than Success
+			return null;
 		}
 		return createElement(result.locator, result.className);
 	}

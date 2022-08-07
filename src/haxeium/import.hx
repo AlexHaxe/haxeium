@@ -19,5 +19,6 @@ import haxeium.commands.ResultError;
 import haxeium.commands.ResultFindElement;
 import haxeium.commands.ResultFindElements;
 import haxeium.commands.ResultPropGet;
+import haxeium.commands.ResultStatusHandler;
 
 using StringTools;
