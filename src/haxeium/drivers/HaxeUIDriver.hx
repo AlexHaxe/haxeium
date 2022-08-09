@@ -156,15 +156,23 @@ class HaxeUIDriver extends DriverBase<Component> {
 			switch (command.eventName) {
 				case Click:
 					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.LEFT);
+					#if sys
 					Sys.sleep(0.02);
+					#end
 					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.LEFT);
 				case DoubleClick:
 					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.LEFT);
+					#if sys
 					Sys.sleep(0.02);
+					#end
 					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.LEFT);
+					#if sys
 					Sys.sleep(0.05);
+					#end
 					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.LEFT);
+					#if sys
 					Sys.sleep(0.02);
+					#end
 					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.LEFT);
 				case MouseDown:
 					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.LEFT);
@@ -174,7 +182,9 @@ class HaxeUIDriver extends DriverBase<Component> {
 					lime.app.Application.current.window.onMouseWheel.dispatch(command.x, command.y, lime.ui.MouseWheelMode.UNKNOWN);
 				case MiddleClick:
 					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.MIDDLE);
+					#if sys
 					Sys.sleep(0.02);
+					#end
 					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.MIDDLE);
 				case MiddleMouseDown:
 					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.MIDDLE);
@@ -182,7 +192,9 @@ class HaxeUIDriver extends DriverBase<Component> {
 					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.MIDDLE);
 				case RightClick:
 					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.RIGHT);
+					#if sys
 					Sys.sleep(0.02);
+					#end
 					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.RIGHT);
 				case RightMouseDown:
 					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.RIGHT);
@@ -227,9 +239,8 @@ class HaxeUIDriver extends DriverBase<Component> {
 			return error(command.locator, e.message);
 		}
 		return success(command.locator);
-	}
+	} // @:access(lime.app.Application)
 
-	// @:access(lime.app.Application)
 	function doKeyboardEvent(command:CommandKeyboardEvent):ResultBase {
 		try {
 			switch (command.eventName) {
