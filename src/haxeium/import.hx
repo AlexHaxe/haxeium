@@ -13,6 +13,7 @@ import haxeium.commands.CommandPropSet;
 import haxeium.commands.CommandRestart;
 import haxeium.commands.CommandScreenGrab;
 import haxeium.commands.ElementLocator;
+import haxeium.commands.LocatorHelper;
 import haxeium.commands.LocatorType;
 import haxeium.commands.ResultBase;
 import haxeium.commands.ResultError;

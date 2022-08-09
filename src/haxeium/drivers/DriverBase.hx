@@ -8,7 +8,7 @@ import haxe.io.Bytes;
 import hx.ws.Types.MessageType;
 import hx.ws.WebSocket;
 
-abstract class DriverBase<T> {
+class DriverBase<T> {
 	var socket:WebSocket;
 	var components:Array<T>;
 
@@ -46,7 +46,7 @@ abstract class DriverBase<T> {
 			case StrMessage(content):
 				var result = runCommand(Json.parse(content));
 				if (result != null) {
-					if (result is Bytes) {
+					if ((result is Bytes)) {
 						socket.send(result);
 					} else {
 						socket.send(Json.stringify(result));
@@ -97,17 +97,29 @@ abstract class DriverBase<T> {
 		return {type: ByIndex, location: '$index'};
 	}
 
-	abstract function doFindElement(command:CommandFindElement):ResultBase;
+	function doFindElement(command:CommandFindElement):ResultBase {
+		return null;
+	};
 
-	abstract function doFindElements(command:CommandFindElements):ResultBase;
+	function doFindElements(command:CommandFindElements):ResultBase {
+		return null;
+	};
 
-	abstract function doFindElementsUnderPoint(command:CommandFindElementsUnderPoint):ResultBase;
+	function doFindElementsUnderPoint(command:CommandFindElementsUnderPoint):ResultBase {
+		return null;
+	};
 
-	abstract function doFindChildren(command:CommandFindChildren):ResultBase;
+	function doFindChildren(command:CommandFindChildren):ResultBase {
+		return null;
+	};
 
-	abstract function doMouseEvent(command:CommandMouseEvent):ResultBase;
+	function doMouseEvent(command:CommandMouseEvent):ResultBase {
+		return null;
+	};
 
-	abstract function doKeyboardEvent(command:CommandKeyboardEvent):ResultBase;
+	function doKeyboardEvent(command:CommandKeyboardEvent):ResultBase {
+		return null;
+	};
 
 	function doScreenGrab(command:CommandBase):EitherType<ResultBase, Bytes> {
 		#if openfl
@@ -121,7 +133,7 @@ abstract class DriverBase<T> {
 	}
 
 	function doPropSet(command:CommandPropSet):ResultBase {
-		var component = findComponent(elementToByLocator(command.locator));
+		var component = findComponent(LocatorHelper.elementToByLocator(command.locator));
 		if (component == null) {
 			return notFound(command.locator);
 		}
@@ -132,7 +144,7 @@ abstract class DriverBase<T> {
 	}
 
 	function doPropGet(command:CommandPropGet):ResultBase {
-		var component = findComponent(elementToByLocator(command.locator));
+		var component = findComponent(LocatorHelper.elementToByLocator(command.locator));
 		if (component == null) {
 			return notFound(command.locator);
 		}
@@ -152,7 +164,9 @@ abstract class DriverBase<T> {
 		#end
 	}
 
-	abstract function findComponent(locator:ByLocator, ?parent:ByLocator):T;
+	function findComponent(locator:ByLocator, ?parent:ByLocator):T {
+		return null;
+	};
 
 	function success(?locator:ElementLocator):ResultBase {
 		return {

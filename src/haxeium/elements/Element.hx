@@ -22,14 +22,14 @@ class Element {
 	}
 
 	function mouseEvent(eventName:MouseEventName, handler:Null<ResultStatusHandler> = null) {
-		var cmd:CommandMouseEvent = {command: MouseEvent, locator: byToElementLocator(locator), eventName: eventName};
+		var cmd:CommandMouseEvent = {command: MouseEvent, locator: LocatorHelper.byToElementLocator(locator), eventName: eventName};
 		var result:ResultBase = AppDriver.instance.send(cmd);
 		if (result == null) {
 			Assert.fail('mouse event "$eventName" failed');
 			return;
 		}
 		if (handler == null) {
-			handler = expectSuccessResult;
+			handler = ResultStatusHelper.expectSuccessResult;
 		}
 		handler('mouse event "$eventName"', result.status);
 	}
@@ -73,7 +73,7 @@ class Element {
 			return;
 		}
 		if (handler == null) {
-			handler = expectSuccessResult;
+			handler = ResultStatusHelper.expectSuccessResult;
 		}
 		handler('keyboard event "$eventName"', result.status);
 	}
@@ -87,14 +87,14 @@ class Element {
 	}
 
 	public function getProp(name:String, handler:Null<ResultStatusHandler> = null):Any {
-		var cmd:CommandPropGet = {command: PropGet, locator: byToElementLocator(locator), name: name};
+		var cmd:CommandPropGet = {command: PropGet, locator: LocatorHelper.byToElementLocator(locator), name: name};
 		var result:ResultPropGet = cast AppDriver.instance.send(cmd);
 		if (result == null) {
 			Assert.fail('getProp "$name" failed');
 			return null;
 		}
 		if (handler == null) {
-			handler = expectSuccessResult;
+			handler = ResultStatusHelper.expectSuccessResult;
 		}
 		handler('getProp "$name"', result.status);
 		if (result.value != null) {
@@ -111,7 +111,7 @@ class Element {
 	public function setProp(name:String, value:Any, handler:Null<ResultStatusHandler> = null):Any {
 		var cmd:CommandPropSet = {
 			command: PropSet,
-			locator: byToElementLocator(locator),
+			locator: LocatorHelper.byToElementLocator(locator),
 			name: name,
 			value: value
 		};
@@ -121,7 +121,7 @@ class Element {
 			return null;
 		}
 		if (handler == null) {
-			handler = expectSuccessResult;
+			handler = ResultStatusHelper.expectSuccessResult;
 		}
 		handler('setProp "$name"', result.status);
 		return result.value;

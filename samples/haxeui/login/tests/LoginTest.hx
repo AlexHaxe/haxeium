@@ -10,7 +10,7 @@ class LoginTest extends TestBaseAllRestarts {
 		button.click();
 		Wait.untilElementBecomesAvailable(ById("username"));
 		// should not be clickable when there is a modal dialog
-		button.click(expectNotVisibleResult);
+		button.click(ResultStatusHelper.expectNotVisibleResult);
 		var dialog = driver.findElements(ByClassName("LoginDialog"));
 		Assert.notNull(dialog);
 	}
@@ -22,7 +22,7 @@ class LoginTest extends TestBaseAllRestarts {
 		Wait.untilElementBecomesAvailable(ByClassName("LoginDialog"));
 		var cancel = driver.findElement(ById("{{dialog.cancel}}"));
 		cancel.click();
-		var dialog = driver.findElement(ByClassName("LoginDialog"), expectNotFoundResult);
+		var dialog = driver.findElement(ByClassName("LoginDialog"), ResultStatusHelper.expectNotFoundResult);
 		Assert.isNull(dialog);
 	}
 
@@ -86,9 +86,9 @@ class LoginTest extends TestBaseAllRestarts {
 
 		var loginBtn = driver.findElement(ById("login"));
 		loginBtn.click();
-		var dialog = driver.findElement(ByClassName("LoginDialog"), expectNotFoundResult);
+		var dialog = driver.findElement(ByClassName("LoginDialog"), ResultStatusHelper.expectNotFoundResult);
 		Assert.isNull(dialog);
-		var messageBox = driver.findElement(ByCssClass("messagebox"), expectNotFoundResult);
+		var messageBox = driver.findElement(ByCssClass("messagebox"), ResultStatusHelper.expectNotFoundResult);
 		Assert.isNull(messageBox);
 	}
 
@@ -113,9 +113,9 @@ class LoginTest extends TestBaseAllRestarts {
 
 		var loginBtn = driver.findElement(ById("login"));
 		loginBtn.click();
-		var dialog = driver.findElement(ByClassName("LoginDialog"), expectNotFoundResult);
+		var dialog = driver.findElement(ByClassName("LoginDialog"), ResultStatusHelper.expectNotFoundResult);
 		Assert.isNull(dialog);
-		var messageBox = driver.findElement(ByCssClass("messagebox"), expectNotFoundResult);
+		var messageBox = driver.findElement(ByCssClass("messagebox"), ResultStatusHelper.expectNotFoundResult);
 		Assert.isNull(messageBox);
 	}
 }

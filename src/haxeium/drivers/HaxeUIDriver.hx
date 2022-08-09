@@ -20,8 +20,8 @@ class HaxeUIDriver extends DriverBase<Component> {
 		super(url);
 	}
 
-	function doFindElement(command:CommandFindElement):ResultBase {
-		var component = findComponent(elementToByLocator(command.locator), elementToByLocator(command.parent));
+	override function doFindElement(command:CommandFindElement):ResultBase {
+		var component = findComponent(LocatorHelper.elementToByLocator(command.locator), LocatorHelper.elementToByLocator(command.parent));
 		if (component == null) {
 			return notFound(command.locator);
 		}
@@ -30,10 +30,10 @@ class HaxeUIDriver extends DriverBase<Component> {
 		return result;
 	}
 
-	function doFindElements(command:CommandFindElements):ResultBase {
+	override function doFindElements(command:CommandFindElements):ResultBase {
 		var matchingComponents:Array<Component> = [];
 
-		var byLocator = elementToByLocator(command.locator);
+		var byLocator = LocatorHelper.elementToByLocator(command.locator);
 		function searchComponents(root:Component) {
 			switch (byLocator) {
 				case ByIndex(index):
@@ -75,7 +75,7 @@ class HaxeUIDriver extends DriverBase<Component> {
 			}
 		}
 		if (command.parent != null) {
-			searchComponents(findComponent(elementToByLocator(command.parent)));
+			searchComponents(findComponent(LocatorHelper.elementToByLocator(command.parent)));
 		} else {
 			for (root in Screen.instance.rootComponents) {
 				searchComponents(root);
@@ -93,7 +93,7 @@ class HaxeUIDriver extends DriverBase<Component> {
 		return results;
 	}
 
-	function doFindElementsUnderPoint(command:CommandFindElementsUnderPoint):ResultBase {
+	override function doFindElementsUnderPoint(command:CommandFindElementsUnderPoint):ResultBase {
 		var components = Screen.instance.findComponentsUnderPoint(command.x, command.y);
 		var results:ResultFindElements = cast success(command.locator);
 		results.elements = [];
@@ -103,8 +103,8 @@ class HaxeUIDriver extends DriverBase<Component> {
 		return results;
 	}
 
-	function doFindChildren(command:CommandFindChildren):ResultBase {
-		var parentComponent:Component = findComponent(elementToByLocator(command.locator));
+	override function doFindChildren(command:CommandFindChildren):ResultBase {
+		var parentComponent:Component = findComponent(LocatorHelper.elementToByLocator(command.locator));
 		if (parentComponent == null) {
 			return notFound(command.locator);
 		}
@@ -143,21 +143,21 @@ class HaxeUIDriver extends DriverBase<Component> {
 	}
 
 	function isComponentInteractive(component:Component):Bool {
-		if (component is InteractiveComponent) {
+		if ((component is InteractiveComponent)) {
 			var interactive:InteractiveComponent = cast component;
 			return (interactive.allowFocus);
 		}
 		return false;
 	}
 
-	function doMouseEvent(command:CommandMouseEvent):ResultBase {
+	override function doMouseEvent(command:CommandMouseEvent):ResultBase {
 		var component:Component;
 
 		var x:Null<Float> = command.x;
 		var y:Null<Float> = command.y;
 
 		if (command.x == null || command.y == null) {
-			component = cast findComponent(elementToByLocator(command.locator));
+			component = cast findComponent(LocatorHelper.elementToByLocator(command.locator));
 			if (component == null) {
 				return notFound(command.locator);
 			}
@@ -223,7 +223,7 @@ class HaxeUIDriver extends DriverBase<Component> {
 		return success(command.locator);
 	}
 
-	function doKeyboardEvent(command:CommandKeyboardEvent):ResultBase {
+	override function doKeyboardEvent(command:CommandKeyboardEvent):ResultBase {
 		try {
 			#if lime
 			LimeDispatchHelper.dispatchKeyboardEvent(command);
@@ -239,7 +239,7 @@ class HaxeUIDriver extends DriverBase<Component> {
 		if (result.status != Success) {
 			return result;
 		}
-		if (result.value is Component) {
+		if ((result.value is Component)) {
 			var component = cast result.value;
 			result.value = getComponentLocator(component);
 			result.className = component.className;
@@ -247,7 +247,7 @@ class HaxeUIDriver extends DriverBase<Component> {
 		return result;
 	}
 
-	function findComponent(locator:ByLocator, ?parent:ByLocator):Component {
+	override function findComponent(locator:ByLocator, ?parent:ByLocator):Component {
 		var component:Component = null;
 
 		function searchComponent(root:Component) {

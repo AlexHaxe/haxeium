@@ -80,14 +80,18 @@ class AppDriver {
 	}
 
 	public function findElement(locator:ByLocator, ?parent:ByLocator, ?handler:ResultStatusHandler):Null<Element> {
-		var command:CommandFindElement = {command: FindElement, locator: byToElementLocator(locator), parent: byToElementLocator(parent)};
+		var command:CommandFindElement = {
+			command: FindElement,
+			locator: LocatorHelper.byToElementLocator(locator),
+			parent: LocatorHelper.byToElementLocator(parent)
+		};
 
 		var result:ResultFindElement = cast send(command);
 		if (result == null) {
 			throw new NoSuchElementException(locator);
 		}
 		if (handler == null) {
-			handler = expectSuccessResult;
+			handler = ResultStatusHelper.expectSuccessResult;
 		}
 		if (!handler("findElement", result.status)) {
 			throw new NoSuchElementException(locator);
@@ -103,8 +107,8 @@ class AppDriver {
 	public function findElements(locator:ByLocator, ?parent:ByLocator):Array<Element> {
 		var command:CommandFindElements = {
 			command: FindElements,
-			locator: byToElementLocator(locator),
-			parent: byToElementLocator(parent)
+			locator: LocatorHelper.byToElementLocator(locator),
+			parent: LocatorHelper.byToElementLocator(parent)
 		};
 
 		var result:ResultFindElements = cast send(command);
@@ -118,7 +122,7 @@ class AppDriver {
 	}
 
 	public function findChildren(parent:ByLocator):Array<Element> {
-		var command:CommandFindChildren = {command: FindChildren, locator: byToElementLocator(parent)};
+		var command:CommandFindChildren = {command: FindChildren, locator: LocatorHelper.byToElementLocator(parent)};
 
 		var result:ResultFindElements = cast send(command);
 		if (result == null) {
@@ -142,7 +146,7 @@ class AppDriver {
 	}
 
 	public static function createElement(locator:ElementLocator, className:String):Element {
-		var byLocator = elementToByLocator(locator);
+		var byLocator = LocatorHelper.elementToByLocator(locator);
 		return switch (className) {
 			case "haxe.ui.components.DropDown":
 				new DropDownElement(byLocator);
@@ -322,6 +326,22 @@ class AppDriver {
 		}
 		logger(text);
 	}
+
+	public static function traceLogger(text:String) {
+		trace(text);
+	}
+
+	public static function printLogger(text:String) {
+		Sys.println(text);
+	}
+
+	public static var loggerFileName = "driver.log";
+
+	public static function fileLogger(text:String) {
+		var output = File.append(loggerFileName);
+		output.writeString(text + "\n");
+		output.close();
+	}
 }
 
 class AppSocketHandler extends WebSocketHandler {
@@ -349,19 +369,3 @@ class AppSocketHandler extends WebSocketHandler {
 }
 
 typedef LogFunction = (text:String) -> Void;
-
-function traceLogger(text:String) {
-	trace(text);
-}
-
-function printLogger(text:String) {
-	Sys.println(text);
-}
-
-var loggerFileName = "driver.log";
-
-function fileLogger(text:String) {
-	var output = File.append(loggerFileName);
-	output.writeString(text + "\n");
-	output.close();
-}

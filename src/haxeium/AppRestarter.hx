@@ -15,7 +15,7 @@ class AppRestarter {
 		this.cmd = cmd;
 		this.programmArgs = programmArgs;
 		this.workingFolder = workingFolder;
-		this.logger = traceLogger;
+		this.logger = AppDriver.traceLogger;
 	}
 
 	public function start() {
