@@ -23,14 +23,12 @@ class ButtonTest extends TestBaseAllRestarts {
 		var button2 = driver.findElement(ById("button2"));
 		Assert.equals("Click Me!", button1.text);
 		Assert.equals("Click Me!", button2.text);
-
 		var buttons = driver.findElements(ByCssClass("button"));
 		Assert.isTrue(buttons.length > 0);
 		for (button in buttons) {
-			trace(button.text);
+			// trace(button.text);
 			button.click();
 		}
-
 		Assert.equals("Thanks!", button1.text);
 		Assert.equals("Thanks!", button2.text);
 	}

@@ -48,12 +48,12 @@ class LoginTest extends TestBaseAllRestarts {
 		Assert.equals("Login", button.text);
 		button.click();
 		Wait.untilElementBecomesAvailable(ById("username"));
+
 		var username = driver.findElement(ById("username"));
 		username.click();
 		username.keyPress("admin");
 		Assert.equals("admin", username.text);
-		username.keyDown(8);
-		Assert.equals("admi", username.text);
+
 		var loginBtn = driver.findElement(ById("login"));
 		loginBtn.click();
 		Wait.untilElementBecomesAvailable(ByCssClass("messagebox"));
@@ -71,16 +71,46 @@ class LoginTest extends TestBaseAllRestarts {
 		Assert.equals("Login", button.text);
 		button.click();
 		Wait.untilElementBecomesAvailable(ById("username"));
+
 		var username = driver.findElement(ById("username"));
 		username.click();
 		Assert.isTrue(username.getProp("focus"));
 		username.keyPress("admin");
+		Assert.equals("admin", username.text);
+
 		var password = driver.findElement(ById("password"));
 		password.click();
 		Assert.isTrue(password.getProp("focus"));
 		password.keyPress("admin");
-		Assert.equals("admin", username.text);
 		Assert.equals("admin", password.text);
+
+		var loginBtn = driver.findElement(ById("login"));
+		loginBtn.click();
+		var dialog = driver.findElement(ByClassName("LoginDialog"), expectNotFoundResult);
+		Assert.isNull(dialog);
+		var messageBox = driver.findElement(ByCssClass("messagebox"), expectNotFoundResult);
+		Assert.isNull(messageBox);
+	}
+
+	public function testSubmitUserMistypeAndPassword() {
+		var button = driver.findElement(ById("loginButton"));
+		Assert.equals("Login", button.text);
+		button.click();
+		Wait.untilElementBecomesAvailable(ById("username"));
+
+		var username = driver.findElement(ById("username"));
+		username.click();
+		Assert.isTrue(username.getProp("focus"));
+		username.keyPress("adminn");
+		username.keyDown(8);
+		Assert.equals("admin", username.text);
+
+		var password = driver.findElement(ById("password"));
+		password.click();
+		Assert.isTrue(password.getProp("focus"));
+		password.keyPress("admin");
+		Assert.equals("admin", password.text);
+
 		var loginBtn = driver.findElement(ById("login"));
 		loginBtn.click();
 		var dialog = driver.findElement(ByClassName("LoginDialog"), expectNotFoundResult);

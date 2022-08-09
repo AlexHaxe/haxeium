@@ -3,3 +3,4 @@ build
 .unittest
 driver.log
 out.js
+node_modules

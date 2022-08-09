@@ -33,6 +33,7 @@ class TabViewTest extends TestBaseAllRestarts {
 		Assert.equals(3, tabBarButtons.length);
 
 		tabBarButtons[1].click();
+		// tabBarButtons[1].findElement(ByCssClass("image")).click();
 		Assert.equals("Page 2", tabBarButtons[1].text);
 
 		Assert.equals(1, tabView.getProp("pageIndex"));

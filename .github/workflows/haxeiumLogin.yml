@@ -1,0 +1,53 @@
+name: Haxium-Login
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        haxe-version: ['4.2.5', 'nightly']
+        platform: [ubuntu-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - name: Set Git Auto CRLF to false on Windows
+      if: matrix.platform == 'windows-latest'
+      run: git config --global core.autocrlf false
+    - name: Checkout Haxeium sources
+      uses: actions/checkout@v1
+    - name: Use Node.js 10
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10
+    - name: Run npm install
+      run: npm ci
+    - name: Install Haxe version ${{ matrix.haxe-version }}
+      run: |
+        npx lix download haxe ${{ matrix.haxe-version }}
+        npx lix use haxe ${{ matrix.haxe-version }}
+    - name: Run lix download
+      run: npx lix download
+    - name: Print versions
+      run: |
+        npx haxe -version
+        npx neko -version
+        npx haxelib list
+    - name: Build Login App
+      run: |
+        cd samples/haxeui/login
+        npx lix download
+        npx lime build linux
+    - name: Build Login tests
+      run: |
+        cd samples/haxeui/login
+        npx haxe build.hxml
+    - name: Build Login tests
+      run: |
+        cd samples/haxeui/login
+        bin/TestMain

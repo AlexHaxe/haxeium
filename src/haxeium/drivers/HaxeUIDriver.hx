@@ -13,6 +13,7 @@ import haxe.ui.styles.elements.RuleElement;
 import hx.ws.Types.MessageType;
 import hx.ws.WebSocket;
 import openfl.events.Event;
+import haxeium.drivers.events.LimeDispatchHelper;
 
 class HaxeUIDriver extends DriverBase<Component> {
 	public function new(url:String) {
@@ -116,25 +117,37 @@ class HaxeUIDriver extends DriverBase<Component> {
 		return results;
 	}
 
-	@:access(haxe.ui.core.Component)
 	function findInteractiveComponent(x:Float, y:Float):Null<Component> {
 		var components = Screen.instance.findComponentsUnderPoint(x, y);
 		if (components.length <= 0) {
 			return null;
 		}
 		var componentUnderPoint:Null<Component> = null;
-		for (comp in components) {
-			if (comp.id == "modal-background") {
-				return comp;
+		var rootComponent = null;
+		for (component in components) {
+			if (rootComponent == null) {
+				rootComponent = component.rootComponent;
 			}
-			if (comp is InteractiveComponent) {
-				return comp;
+			if ((rootComponent != component.rootComponent) && (componentUnderPoint != null)) {
+				return componentUnderPoint;
 			}
-			if (comp.onClick != null || comp.hasEvent(MouseEvent.RIGHT_CLICK)) {
-				return comp;
+			if (component.id == "modal-background") {
+				componentUnderPoint = component;
+				continue;
+			}
+			if (isComponentInteractive(component)) {
+				componentUnderPoint = component;
 			}
 		}
-		return null;
+		return componentUnderPoint;
+	}
+
+	function isComponentInteractive(component:Component):Bool {
+		if (component is InteractiveComponent) {
+			var interactive:InteractiveComponent = cast component;
+			return (interactive.allowFocus);
+		}
+		return false;
 	}
 
 	function doMouseEvent(command:CommandMouseEvent):ResultBase {
@@ -148,64 +161,33 @@ class HaxeUIDriver extends DriverBase<Component> {
 			if (component == null) {
 				return notFound(command.locator);
 			}
+			if (component.hidden) {
+				return notVisible(command.locator);
+			}
+			if (component.disabled) {
+				return disabled(command.locator);
+			}
 			x = component.screenLeft + component.width / 2;
 			y = component.screenTop + component.height / 2;
-		}
-		#if lime
-		try {
-			switch (command.eventName) {
-				case Click:
-					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.LEFT);
-					#if sys
-					Sys.sleep(0.02);
-					#end
-					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.LEFT);
-				case DoubleClick:
-					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.LEFT);
-					#if sys
-					Sys.sleep(0.02);
-					#end
-					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.LEFT);
-					#if sys
-					Sys.sleep(0.05);
-					#end
-					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.LEFT);
-					#if sys
-					Sys.sleep(0.02);
-					#end
-					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.LEFT);
-				case MouseDown:
-					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.LEFT);
-				case MouseUp:
-					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.LEFT);
-				case MouseWheel:
-					lime.app.Application.current.window.onMouseWheel.dispatch(command.x, command.y, lime.ui.MouseWheelMode.UNKNOWN);
-				case MiddleClick:
-					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.MIDDLE);
-					#if sys
-					Sys.sleep(0.02);
-					#end
-					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.MIDDLE);
-				case MiddleMouseDown:
-					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.MIDDLE);
-				case MiddleMouseUp:
-					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.MIDDLE);
-				case RightClick:
-					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.RIGHT);
-					#if sys
-					Sys.sleep(0.02);
-					#end
-					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.RIGHT);
-				case RightMouseDown:
-					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.RIGHT);
-				case RightMouseUp:
-					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.RIGHT);
+			if (isComponentInteractive(component)) {
+				// if we are sending a mouse event to an interactive component, then it should be the one found through findInteractiveComponent
+				var componentUnderPoint = findInteractiveComponent(x, y);
+				if (componentUnderPoint == null) {
+					return notVisible(command.locator);
+				}
+				if (componentUnderPoint != component) {
+					return notVisible(command.locator);
+				}
 			}
+		}
+		try {
+			#if lime
+			LimeDispatchHelper.dispatchMouseEvent(command, x, y);
+			return success(command.locator);
+			#end
 		} catch (e:Exception) {
 			return error(command.locator, e.message);
 		}
-		return success(command.locator);
-		#end
 
 		if (command.x != null && command.y != null) {
 			component = findInteractiveComponent(command.x, command.y);
@@ -239,35 +221,13 @@ class HaxeUIDriver extends DriverBase<Component> {
 			return error(command.locator, e.message);
 		}
 		return success(command.locator);
-	} // @:access(lime.app.Application)
+	}
 
 	function doKeyboardEvent(command:CommandKeyboardEvent):ResultBase {
 		try {
-			switch (command.eventName) {
-				case KeyPress:
-					if (command.text == null || command.text.length <= 0) {
-						return success();
-					}
-					#if lime
-					lime.app.Application.current.window.onTextInput.dispatch(command.text);
-					#end
-				case KeyDown:
-					if (command.keyCode == null) {
-						return success();
-					}
-					#if lime
-					var modifier = (command.shiftKey ? (lime.ui.KeyModifier.SHIFT) : 0) | (command.ctrlKey ? (lime.ui.KeyModifier.CTRL) : 0) | (command.altKey ? (lime.ui.KeyModifier.ALT) : 0);
-					lime.app.Application.current.window.onKeyDown.dispatch(command.keyCode, modifier);
-					#end
-				case KeyUp:
-					if (command.keyCode == null) {
-						return success();
-					}
-					#if lime
-					var modifier = (command.shiftKey ? (lime.ui.KeyModifier.SHIFT) : 0) | (command.ctrlKey ? (lime.ui.KeyModifier.CTRL) : 0) | (command.altKey ? (lime.ui.KeyModifier.ALT) : 0);
-					lime.app.Application.current.window.onKeyUp.dispatch(command.keyCode, modifier);
-					#end
-			}
+			#if lime
+			LimeDispatchHelper.dispatchKeyboardEvent(command);
+			#end
 			return success();
 		} catch (e:Exception) {
 			return error(e.message);
