@@ -1,8 +1,5 @@
 package haxeium.elements;
 
-import utest.Assert;
-import haxeium.AppDriver;
-
 class Element {
 	public var locator:ByLocator;
 
@@ -38,25 +35,29 @@ class Element {
 	}
 
 	public function keyPress(text:String, handler:Null<ResultStatusHandler> = null) {
-		keyboardEvent(KeyPress, text, handler);
+		keyboardEvent(KeyPress, text, null, handler);
 	}
 
-	public function keyDown(text:String, handler:Null<ResultStatusHandler> = null) {
-		keyboardEvent(KeyDown, text, handler);
+	public function keyDown(keyCode:Int, handler:Null<ResultStatusHandler> = null) {
+		keyboardEvent(KeyDown, null, keyCode, handler);
 	}
 
-	public function keyUp(text:String, handler:Null<ResultStatusHandler> = null) {
-		keyboardEvent(KeyUp, text, handler);
+	public function keyUp(keyCode:Int, handler:Null<ResultStatusHandler> = null) {
+		keyboardEvent(KeyUp, null, keyCode, handler);
 	}
 
-	function keyboardEvent(eventName:KeyboardEventName, text:String, altKey:Null<Bool> = null, ctrlKey:Null<Bool> = null, shiftKey:Null<Bool> = null,
-			handler:Null<ResultStatusHandler> = null) {
+	function keyboardEvent(eventName:KeyboardEventName, text:Null<String>, keyCode:Null<Int>, altKey:Null<Bool> = null, ctrlKey:Null<Bool> = null,
+			shiftKey:Null<Bool> = null, handler:Null<ResultStatusHandler> = null) {
 		var cmd:CommandKeyboardEvent = {
 			command: KeyboardEvent,
-			locator: byToElementLocator(locator),
-			eventName: eventName,
-			text: text
+			eventName: eventName
 		};
+		if (text != null) {
+			cmd.text = text;
+		}
+		if (keyCode != null) {
+			cmd.keyCode = keyCode;
+		}
 		if (altKey != null) {
 			cmd.altKey = altKey;
 		}
@@ -137,20 +138,4 @@ class Element {
 	public function findElements(loc:ByLocator):Array<Element> {
 		return AppDriver.instance.findElements(loc, locator);
 	}
-}
-
-typedef ResultStatusHandler = (name:String, status:ResultStatus) -> Void;
-
-function expectSuccessResult(name:String, status:ResultStatus) {
-	if (status == Success) {
-		return;
-	}
-	Assert.fail('$name failed with $status');
-}
-
-function expectNotVisibleResult(name:String, status:ResultStatus) {
-	if (status == FailedNotVisible) {
-		return;
-	}
-	Assert.fail('$name failed with $status');
 }

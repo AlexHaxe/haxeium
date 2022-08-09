@@ -3,6 +3,7 @@ package haxeium.drivers;
 import haxe.Exception;
 import haxe.Json;
 import haxe.Timer;
+import haxe.ui.components.TextField;
 import haxe.ui.core.Component;
 import haxe.ui.core.InteractiveComponent;
 import haxe.ui.core.Screen;
@@ -11,6 +12,7 @@ import haxe.ui.events.MouseEvent;
 import haxe.ui.styles.elements.RuleElement;
 import hx.ws.Types.MessageType;
 import hx.ws.WebSocket;
+import openfl.events.Event;
 
 class HaxeUIDriver extends DriverBase<Component> {
 	public function new(url:String) {
@@ -137,16 +139,65 @@ class HaxeUIDriver extends DriverBase<Component> {
 
 	function doMouseEvent(command:CommandMouseEvent):ResultBase {
 		var component:Component;
-		if (command.x != null && command.y != null) {
-			component = findInteractiveComponent(command.x, command.y);
-		} else {
+
+		var x:Null<Float> = command.x;
+		var y:Null<Float> = command.y;
+
+		if (command.x == null || command.y == null) {
 			component = cast findComponent(elementToByLocator(command.locator));
 			if (component == null) {
 				return notFound(command.locator);
 			}
+			x = component.screenLeft + component.width / 2;
+			y = component.screenTop + component.height / 2;
+		}
+		#if lime
+		try {
+			switch (command.eventName) {
+				case Click:
+					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.LEFT);
+					Sys.sleep(0.02);
+					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.LEFT);
+				case DoubleClick:
+					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.LEFT);
+					Sys.sleep(0.02);
+					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.LEFT);
+					Sys.sleep(0.05);
+					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.LEFT);
+					Sys.sleep(0.02);
+					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.LEFT);
+				case MouseDown:
+					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.LEFT);
+				case MouseUp:
+					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.LEFT);
+				case MouseWheel:
+					lime.app.Application.current.window.onMouseWheel.dispatch(command.x, command.y, lime.ui.MouseWheelMode.UNKNOWN);
+				case MiddleClick:
+					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.MIDDLE);
+					Sys.sleep(0.02);
+					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.MIDDLE);
+				case MiddleMouseDown:
+					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.MIDDLE);
+				case MiddleMouseUp:
+					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.MIDDLE);
+				case RightClick:
+					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.RIGHT);
+					Sys.sleep(0.02);
+					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.RIGHT);
+				case RightMouseDown:
+					lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.RIGHT);
+				case RightMouseUp:
+					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.RIGHT);
+			}
+		} catch (e:Exception) {
+			return error(command.locator, e.message);
+		}
+		return success(command.locator);
+		#end
 
-			var x = component.screenLeft + component.width / 2;
-			var y = component.screenTop + component.height / 2;
+		if (command.x != null && command.y != null) {
+			component = findInteractiveComponent(command.x, command.y);
+		} else {
 			var componentUnderPoint = findInteractiveComponent(x, y);
 			if (componentUnderPoint == null) {
 				return notVisible(command.locator);
@@ -165,9 +216,9 @@ class HaxeUIDriver extends DriverBase<Component> {
 			return disabled(command.locator);
 		}
 
-		// if (!component.hasEvent(command.eventName)) {
-		// 	return disabled(command.locator);
-		// }
+		if (!component.hasEvent(command.eventName)) {
+			return disabled(command.locator);
+		}
 		var event = new MouseEvent(command.eventName);
 		event.target = component;
 		try {
@@ -178,66 +229,37 @@ class HaxeUIDriver extends DriverBase<Component> {
 		return success(command.locator);
 	}
 
+	// @:access(lime.app.Application)
 	function doKeyboardEvent(command:CommandKeyboardEvent):ResultBase {
-		if (command.text.length <= 0) {
-			return success(command.locator);
-		}
-		var component = null;
-		if (command.locator != null) {
-			component = findComponent(elementToByLocator(command.locator));
-			if (component == null) {
-				return notFound(command.locator);
-			}
-
-			var x = component.screenLeft + component.width / 2;
-			var y = component.screenTop + component.height / 2;
-			var componentUnderPoint = findInteractiveComponent(x, y);
-			if (componentUnderPoint == null) {
-				return notVisible(command.locator);
-			}
-			if (componentUnderPoint != component) {
-				return notVisible(command.locator);
-			}
-			if (component.hidden) {
-				return notVisible(command.locator);
-			}
-			if (component.disabled) {
-				return disabled(command.locator);
-			}
-		}
-		var eventName = command.eventName;
-		function dispatchEvent(keyCode:Int) {
-			var event = new KeyboardEvent(eventName);
-
-			event.keyCode = keyCode;
-			event.altKey = command.altKey;
-			event.ctrlKey = command.ctrlKey;
-			event.shiftKey = command.shiftKey;
-			if (component != null) {
-				event.target = component;
-				component.dispatch(event);
-			} else {
-				if (Screen.instance.rootComponents.length <= 0) {
-					return;
-				}
-				Screen.instance.rootComponents[Screen.instance.rootComponents.length - 1].dispatch(event);
-			}
-		}
 		try {
 			switch (command.eventName) {
 				case KeyPress:
-					for (index in 0...command.text.length) {
-						eventName = KeyDown;
-						dispatchEvent(command.text.charCodeAt(index));
-						eventName = KeyUp;
-						dispatchEvent(command.text.charCodeAt(index));
+					if (command.text == null || command.text.length <= 0) {
+						return success();
 					}
-				case KeyDown | KeyUp:
-					dispatchEvent(command.text.charCodeAt(0));
+					#if lime
+					lime.app.Application.current.window.onTextInput.dispatch(command.text);
+					#end
+				case KeyDown:
+					if (command.keyCode == null) {
+						return success();
+					}
+					#if lime
+					var modifier = (command.shiftKey ? (lime.ui.KeyModifier.SHIFT) : 0) | (command.ctrlKey ? (lime.ui.KeyModifier.CTRL) : 0) | (command.altKey ? (lime.ui.KeyModifier.ALT) : 0);
+					lime.app.Application.current.window.onKeyDown.dispatch(command.keyCode, modifier);
+					#end
+				case KeyUp:
+					if (command.keyCode == null) {
+						return success();
+					}
+					#if lime
+					var modifier = (command.shiftKey ? (lime.ui.KeyModifier.SHIFT) : 0) | (command.ctrlKey ? (lime.ui.KeyModifier.CTRL) : 0) | (command.altKey ? (lime.ui.KeyModifier.ALT) : 0);
+					lime.app.Application.current.window.onKeyUp.dispatch(command.keyCode, modifier);
+					#end
 			}
-			return success(command.locator);
+			return success();
 		} catch (e:Exception) {
-			return error(command.locator, e.message);
+			return error(e.message);
 		}
 	}
 

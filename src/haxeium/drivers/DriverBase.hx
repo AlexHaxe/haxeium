@@ -37,7 +37,7 @@ abstract class DriverBase<T> {
 	}
 
 	function onClose() {
-		trace("socket connection closed");
+		// trace("socket connection closed");
 	}
 
 	function onMessage(message:MessageType) {
@@ -56,9 +56,9 @@ abstract class DriverBase<T> {
 	}
 
 	function onError(error) {
-		trace("connection failed - retrying");
+		// trace("connection failed - retrying");
 		socket = null;
-		Timer.delay(start, 500);
+		Timer.delay(start, 2000);
 	}
 
 	function runCommand(command:CommandBase):Null<EitherType<ResultBase, Bytes>> {
@@ -161,7 +161,7 @@ abstract class DriverBase<T> {
 		};
 	}
 
-	function error(locator:ElementLocator, message:String):ResultError {
+	function error(?locator:ElementLocator, message:String):ResultError {
 		return {
 			status: Error,
 			locator: locator,
@@ -169,7 +169,7 @@ abstract class DriverBase<T> {
 		};
 	}
 
-	function disabled(locator:ElementLocator):ResultBase {
+	function disabled(?locator:ElementLocator):ResultBase {
 		return {
 			status: FailedDisabled,
 			locator: locator

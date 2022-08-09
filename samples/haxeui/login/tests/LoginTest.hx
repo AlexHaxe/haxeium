@@ -50,9 +50,10 @@ class LoginTest extends TestBaseAllRestarts {
 		Wait.untilElementBecomesAvailable(ById("username"));
 		var username = driver.findElement(ById("username"));
 		username.click();
-		username.text = "admin";
-		// username.keyPress("admin");
+		username.keyPress("admin");
 		Assert.equals("admin", username.text);
+		username.keyDown(8);
+		Assert.equals("admi", username.text);
 		var loginBtn = driver.findElement(ById("login"));
 		loginBtn.click();
 		Wait.untilElementBecomesAvailable(ByCssClass("messagebox"));
@@ -69,23 +70,19 @@ class LoginTest extends TestBaseAllRestarts {
 		var button = driver.findElement(ById("loginButton"));
 		Assert.equals("Login", button.text);
 		button.click();
-
 		Wait.untilElementBecomesAvailable(ById("username"));
-
 		var username = driver.findElement(ById("username"));
-		// username.click();
-		username.text = "admin";
-
+		username.click();
+		Assert.isTrue(username.getProp("focus"));
+		username.keyPress("admin");
 		var password = driver.findElement(ById("password"));
-		password.text = "admin";
-
-		// username.keyPress("admin");
-		// password.keyPress("admin");
+		password.click();
+		Assert.isTrue(password.getProp("focus"));
+		password.keyPress("admin");
 		Assert.equals("admin", username.text);
 		Assert.equals("admin", password.text);
 		var loginBtn = driver.findElement(ById("login"));
 		loginBtn.click();
-
 		var dialog = driver.findElement(ByClassName("LoginDialog"), expectNotFoundResult);
 		Assert.isNull(dialog);
 		var messageBox = driver.findElement(ByCssClass("messagebox"), expectNotFoundResult);

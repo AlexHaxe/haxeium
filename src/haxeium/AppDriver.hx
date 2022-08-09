@@ -11,10 +11,11 @@ import hx.ws.Types.MessageType;
 import hx.ws.WebSocketHandler;
 import hx.ws.WebSocketServer;
 import utest.Assert;
+import haxeium.commands.ResultStatusHandler;
+import haxeium.commands.ResultStatusHandler;
 import haxeium.elements.DropDownElement;
 import haxeium.elements.Element;
 import haxeium.elements.NoSuchElementException;
-import haxeium.elements.TabBarButtonElement;
 
 class AppDriver {
 	static final RESPONSE_WAIT_TIME:Float = 0.01;
@@ -145,8 +146,6 @@ class AppDriver {
 		return switch (className) {
 			case "haxe.ui.components.DropDown":
 				new DropDownElement(byLocator);
-			case "haxe.ui.components._TabBar.TabBarButton":
-				new TabBarButtonElement(byLocator);
 			default:
 				new Element(byLocator);
 		}
@@ -263,9 +262,9 @@ class AppDriver {
 					case KeyPress:
 						'keyPress(${cmdKeyboard.text})';
 					case KeyDown:
-						'keyDown(${cmdKeyboard.text})';
+						'keyDown(${cmdKeyboard.keyCode})';
 					case KeyUp:
-						'keyUp(${cmdKeyboard.text})';
+						'keyUp(${cmdKeyboard.keyCode})';
 				}
 			case MouseEvent:
 				var cmdMouse:CommandMouseEvent = cast cmd;
@@ -278,12 +277,14 @@ class AppDriver {
 						'mouseUp(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
 					case DoubleClick:
 						'doubleClick(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
-					case MouseOver:
-						'mouseOver(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
-					case MouseOut:
-						'mouseOut(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
 					case MouseWheel:
-						'mouseWheel(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
+						'mouseWheel(${locatorToText(cmdMouse.locator)}, deltaX=${cmdMouse.x}, deltaY=${cmdMouse.y})';
+					case MiddleClick:
+						'middleClick(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
+					case MiddleMouseDown:
+						'middleMouseDown(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
+					case MiddleMouseUp:
+						'middleMouseUp(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
 					case RightClick:
 						'rightClick(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
 					case RightMouseDown:
