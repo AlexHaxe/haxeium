@@ -123,14 +123,7 @@ class HaxeUIDriver extends DriverBase<Component> {
 			return null;
 		}
 		var componentUnderPoint:Null<Component> = null;
-		var rootComponent = null;
 		for (component in components) {
-			if (rootComponent == null) {
-				rootComponent = component.rootComponent;
-			}
-			if ((rootComponent != component.rootComponent) && (componentUnderPoint != null)) {
-				return componentUnderPoint;
-			}
 			if (component.id == "modal-background") {
 				componentUnderPoint = component;
 				continue;

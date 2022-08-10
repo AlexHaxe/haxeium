@@ -19,10 +19,14 @@ class LoginTest extends TestBaseAllRestarts {
 		var button = driver.findElement(ById("loginButton"));
 		Assert.equals("Login", button.text);
 		button.click();
+
 		Wait.untilElementBecomesAvailable(ByClassName("LoginDialog"));
-		var cancel = driver.findElement(ById("{{dialog.cancel}}"));
+		var dialog = driver.findElement(ByClassName("LoginDialog"));
+		Assert.notNull(dialog);
+
+		var cancel = driver.findElement(ById("{{cancel}}"));
 		cancel.click();
-		var dialog = driver.findElement(ByClassName("LoginDialog"), ResultStatusHelper.expectNotFoundResult);
+		dialog = driver.findElement(ByClassName("LoginDialog"), ResultStatusHelper.expectNotFoundResult);
 		Assert.isNull(dialog);
 	}
 
@@ -33,13 +37,14 @@ class LoginTest extends TestBaseAllRestarts {
 		Wait.untilElementBecomesAvailable(ById("username"));
 		var loginBtn = driver.findElement(ById("login"));
 		loginBtn.click();
+
 		Wait.untilElementBecomesAvailable(ByCssClass("messagebox"));
 		var messageBox = driver.findElement(ByCssClass("messagebox"));
 		Assert.equals("Missing Username", messageBox.getProp("title"));
 		Assert.equals("Username is required!", messageBox.getProp("message"));
 		var closeBtn = messageBox.findElement(ByCssClass("button"));
 		closeBtn.click();
-		var cancelBtn = driver.findElement(ById("{{dialog.cancel}}"));
+		var cancelBtn = driver.findElement(ById("{{cancel}}"));
 		cancelBtn.click();
 	}
 
@@ -47,8 +52,8 @@ class LoginTest extends TestBaseAllRestarts {
 		var button = driver.findElement(ById("loginButton"));
 		Assert.equals("Login", button.text);
 		button.click();
-		Wait.untilElementBecomesAvailable(ById("username"));
 
+		Wait.untilElementBecomesAvailable(ById("username"));
 		var username = driver.findElement(ById("username"));
 		username.click();
 		username.keyPress("admin");
@@ -62,7 +67,7 @@ class LoginTest extends TestBaseAllRestarts {
 		Assert.equals("Password is required!", messageBox.getProp("message"));
 		var closeBtn = messageBox.findElement(ByCssClass("button"));
 		closeBtn.click();
-		var cancelBtn = driver.findElement(ById("{{dialog.cancel}}"));
+		var cancelBtn = driver.findElement(ById("{{cancel}}"));
 		cancelBtn.click();
 	}
 
@@ -70,8 +75,8 @@ class LoginTest extends TestBaseAllRestarts {
 		var button = driver.findElement(ById("loginButton"));
 		Assert.equals("Login", button.text);
 		button.click();
-		Wait.untilElementBecomesAvailable(ById("username"));
 
+		Wait.untilElementBecomesAvailable(ById("username"));
 		var username = driver.findElement(ById("username"));
 		username.click();
 		Assert.isTrue(username.getProp("focus"));
@@ -96,8 +101,8 @@ class LoginTest extends TestBaseAllRestarts {
 		var button = driver.findElement(ById("loginButton"));
 		Assert.equals("Login", button.text);
 		button.click();
-		Wait.untilElementBecomesAvailable(ById("username"));
 
+		Wait.untilElementBecomesAvailable(ById("username"));
 		var username = driver.findElement(ById("username"));
 		username.click();
 		Assert.isTrue(username.getProp("focus"));
