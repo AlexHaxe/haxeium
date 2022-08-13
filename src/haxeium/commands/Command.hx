@@ -2,6 +2,7 @@ package haxeium.commands;
 
 enum abstract Command(String) {
 	var FindElement = "findElement";
+	var FindInteractiveElement = "findInteractiveElement";
 	var FindElements = "findElements";
 	var FindElementsUnderPoint = "findElementsUnderPoint";
 	var FindChildren = "findChildren";

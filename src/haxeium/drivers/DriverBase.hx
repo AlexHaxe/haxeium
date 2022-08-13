@@ -65,6 +65,8 @@ class DriverBase<T> {
 		switch (command.command) {
 			case FindElement:
 				return doFindElement(cast command);
+			case FindInteractiveElement:
+				return doFindInteractiveElement(cast command);
 			case FindElements:
 				return doFindElements(cast command);
 			case FindElementsUnderPoint:
@@ -98,6 +100,10 @@ class DriverBase<T> {
 	}
 
 	function doFindElement(command:CommandFindElement):ResultBase {
+		return null;
+	};
+
+	function doFindInteractiveElement(command:CommandFindElement):ResultBase {
 		return null;
 	};
 

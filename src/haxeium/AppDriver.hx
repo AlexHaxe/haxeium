@@ -104,6 +104,31 @@ class AppDriver {
 		return createElement(result.locator, result.className);
 	}
 
+	public function findInteractiveElement(locator:ByLocator, ?parent:ByLocator, ?handler:ResultStatusHandler):Null<Element> {
+		var command:CommandFindElement = {
+			command: FindInteractiveElement,
+			locator: LocatorHelper.byToElementLocator(locator),
+			parent: LocatorHelper.byToElementLocator(parent)
+		};
+
+		var result:ResultFindElement = cast send(command);
+		if (result == null) {
+			throw new NoSuchElementException(locator);
+		}
+		if (handler == null) {
+			handler = ResultStatusHelper.expectSuccessResult;
+		}
+		if (!handler("findInteractiveElement", result.status)) {
+			throw new NoSuchElementException(locator);
+		}
+		if (result.status != Success) {
+			// handler may allow e.g. FailedNotFound because a test expects an element to not exist,
+			// but we don't want an Element instance for anything other than Success
+			return null;
+		}
+		return createElement(result.locator, result.className);
+	}
+
 	public function findElements(locator:ByLocator, ?parent:ByLocator):Array<Element> {
 		var command:CommandFindElements = {
 			command: FindElements,
@@ -175,7 +200,6 @@ class AppDriver {
 		connected = status;
 	}
 
-	@:allow(haxeium.drivers.AppSocketHandler)
 	function onError(error:Any) {
 		Assert.fail('connection error: $error');
 	}
@@ -254,6 +278,8 @@ class AppDriver {
 		var text = switch (cmd.command) {
 			case FindElement:
 				'findElement(${locatorToText(cmdLocator.locator)})';
+			case FindInteractiveElement:
+				'findInteractiveElement(${locatorToText(cmdLocator.locator)})';
 			case FindElements:
 				'findElements(${locatorToText(cmdLocator.locator)})';
 			case FindElementsUnderPoint:

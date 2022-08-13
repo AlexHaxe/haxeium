@@ -30,6 +30,33 @@ class HaxeUIDriver extends DriverBase<Component> {
 		return result;
 	}
 
+	override function doFindInteractiveElement(command:CommandFindElement):ResultBase {
+		var component = findComponent(LocatorHelper.elementToByLocator(command.locator), LocatorHelper.elementToByLocator(command.parent));
+		if (component == null) {
+			return notFound(command.locator);
+		}
+		if (component.hidden) {
+			return notVisible(command.locator);
+		}
+		if (component.disabled) {
+			return disabled(command.locator);
+		}
+		var x = component.screenLeft + component.width / 2;
+		var y = component.screenTop + component.height / 2;
+		// if we are sending a mouse event to an interactive component, then it should be the one found through findInteractiveComponent
+		var componentUnderPoint = findInteractiveComponent(x, y);
+		if (componentUnderPoint == null) {
+			return notVisible(command.locator);
+		}
+		if (componentUnderPoint != component) {
+			return notVisible(command.locator);
+		}
+
+		var result:ResultFindElement = cast success(getComponentLocator(component));
+		result.className = component.className;
+		return result;
+	}
+
 	override function doFindElements(command:CommandFindElements):ResultBase {
 		var matchingComponents:Array<Component> = [];
 
