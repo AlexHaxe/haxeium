@@ -1,4 +1,5 @@
 import haxeium.AppDriver;
+import haxeium.Wait;
 import haxeium.commands.LocatorType;
 import haxeium.test.TestBaseAllRestarts;
 import utest.Assert;
@@ -8,6 +9,8 @@ class ButtonTest extends TestBaseAllRestarts {
 		var button = driver.findElement(ById("button1"));
 		Assert.equals("Click Me!", button.text);
 		button.click();
+
+		Wait.untilPropertyEqualsValue(button.locator, "text", "Thanks!");
 		Assert.equals("Thanks!", button.text);
 	}
 
@@ -15,6 +18,7 @@ class ButtonTest extends TestBaseAllRestarts {
 		var button = driver.findElement(ById("button2"));
 		Assert.equals("Click Me!", button.text);
 		button.click();
+		Wait.untilPropertyEqualsValue(button.locator, "text", "Thanks!");
 		Assert.equals("Thanks!", button.text);
 	}
 
@@ -29,6 +33,7 @@ class ButtonTest extends TestBaseAllRestarts {
 			// trace(button.text);
 			button.click();
 		}
+		Wait.untilPropertyEqualsValue(button1.locator, "text", "Thanks!");
 		Assert.equals("Thanks!", button1.text);
 		Assert.equals("Thanks!", button2.text);
 	}

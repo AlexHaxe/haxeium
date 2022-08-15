@@ -13,11 +13,41 @@ class DriverBase<T> {
 	var components:Array<T>;
 
 	var url:String;
+	var intervalMs:Int;
+	var mainThreadAction:Null<MainThreadAction>;
 
-	public function new(url:String) {
+	public function new(url:String, intervalMs:Int = 100) {
 		components = [];
 		this.url = url;
-		start();
+		this.intervalMs = intervalMs;
+		mainThreadAction = null;
+		Timer.delay(function() {
+			start();
+		}, 500);
+		Timer.delay(pollCommands, intervalMs);
+	}
+
+	function pollCommands() {
+		if (mainThreadAction != null) {
+			mainThreadAction();
+			mainThreadAction = null;
+		}
+		Timer.delay(pollCommands, intervalMs);
+	}
+
+	function runInMainThread(action:MainThreadAction) {
+		mainThreadAction = action;
+		#if sys
+		while (true) {
+			if (mainThreadAction == null) {
+				break;
+			}
+			Sys.sleep(0.01);
+		}
+		#else
+		mainThreadAction();
+		mainThreadAction = null;
+		#end
 	}
 
 	function start() {
@@ -143,7 +173,9 @@ class DriverBase<T> {
 		if (component == null) {
 			return notFound(command.locator);
 		}
-		Reflect.setProperty(component, command.name, command.value);
+		runInMainThread(function() {
+			Reflect.setProperty(component, command.name, command.value);
+		});
 		var result:ResultPropGet = cast success(command.locator);
 		result.value = Reflect.getProperty(component, command.name);
 		return result;
@@ -216,3 +248,5 @@ class DriverBase<T> {
 		};
 	}
 }
+
+typedef MainThreadAction = () -> Void;

@@ -16,8 +16,8 @@ import openfl.events.Event;
 import haxeium.drivers.events.LimeDispatchHelper;
 
 class HaxeUIDriver extends DriverBase<Component> {
-	public function new(url:String) {
-		super(url);
+	public function new(url:String, intervalMs:Int = 100) {
+		super(url, intervalMs);
 	}
 
 	override function doFindElement(command:CommandFindElement):ResultBase {
@@ -202,7 +202,9 @@ class HaxeUIDriver extends DriverBase<Component> {
 		}
 		try {
 			#if lime
-			LimeDispatchHelper.dispatchMouseEvent(command, x, y);
+			runInMainThread(function() {
+				LimeDispatchHelper.dispatchMouseEvent(command, x, y);
+			});
 			return success(command.locator);
 			#end
 		} catch (e:Exception) {
@@ -246,7 +248,9 @@ class HaxeUIDriver extends DriverBase<Component> {
 	override function doKeyboardEvent(command:CommandKeyboardEvent):ResultBase {
 		try {
 			#if lime
-			LimeDispatchHelper.dispatchKeyboardEvent(command);
+			runInMainThread(function() {
+				LimeDispatchHelper.dispatchKeyboardEvent(command);
+			});
 			#end
 			return success();
 		} catch (e:Exception) {

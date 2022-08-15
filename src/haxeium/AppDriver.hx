@@ -258,7 +258,10 @@ class AppDriver {
 		return result;
 	}
 
-	public static function locatorToText(locator:ElementLocator) {
+	public static function locatorToText(locator:Null<ElementLocator>) {
+		if (locator == null) {
+			return "null";
+		}
 		return switch (locator.type) {
 			case ByIndex:
 				'ByIndex(${locator.location})';
@@ -331,24 +334,26 @@ class AppDriver {
 			case ScreenGrab:
 				"screenGrab";
 		}
-		switch (result.status) {
-			case null:
-				text = "timeout - " + text;
-			case Success:
-				text = "success - " + text;
-			case Error:
-				var error:ResultError = cast result;
-				text = "error - " + text + " - " + error.message;
-			case FailedDisabled:
-				text = "failed: disabled - " + text;
-			case FailedNotFound:
-				text = "failed: not found - " + text;
-			case FailedNotVisible:
-				text = "failed: not visible - " + text;
-			case FailedReadOnly:
-				text = "failed: readonly - " + text;
-			case Unsupported:
-				text = "unsupported: " + text;
+		if (result != null) {
+			switch (result.status) {
+				case null:
+					text = "timeout - " + text;
+				case Success:
+					text = "success - " + text;
+				case Error:
+					var error:ResultError = cast result;
+					text = "error - " + text + " - " + error.message;
+				case FailedDisabled:
+					text = "failed: disabled - " + text;
+				case FailedNotFound:
+					text = "failed: not found - " + text;
+				case FailedNotVisible:
+					text = "failed: not visible - " + text;
+				case FailedReadOnly:
+					text = "failed: readonly - " + text;
+				case Unsupported:
+					text = "unsupported: " + text;
+			}
 		}
 		logger(text);
 	}
