@@ -3,9 +3,7 @@ package haxeium.test;
 import utest.Assert;
 import utest.ITest;
 
-class TestBaseOneInstance implements ITest {
-	var driver:AppDriver = AppDriver.instance;
-
+class TestBaseOneInstance extends TestBaseScreenshotAssert {
 	function setupClass() {
 		driver.startApp();
 	}
@@ -13,6 +11,4 @@ class TestBaseOneInstance implements ITest {
 	function teardownClass() {
 		driver.stopApp();
 	}
-
-	public function new() {}
 }
