@@ -8,15 +8,11 @@ class LimeDispatchHelper {
 		switch (command.eventName) {
 			case Click:
 				lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.LEFT);
-				Timer.delay(function() {
-					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.LEFT);
-				}, 20);
+				lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.LEFT);
 			case DoubleClick:
 				command.eventName = Click;
 				dispatchMouseEvent(command, x, y);
-				Timer.delay(function() {
-					dispatchMouseEvent(command, x, y);
-				}, 70);
+				dispatchMouseEvent(command, x, y);
 			case MouseDown:
 				lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.LEFT);
 			case MouseUp:
@@ -25,18 +21,14 @@ class LimeDispatchHelper {
 				lime.app.Application.current.window.onMouseWheel.dispatch(command.x, command.y, lime.ui.MouseWheelMode.UNKNOWN);
 			case MiddleClick:
 				lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.MIDDLE);
-				Timer.delay(function() {
-					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.MIDDLE);
-				}, 20);
+				lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.MIDDLE);
 			case MiddleMouseDown:
 				lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.MIDDLE);
 			case MiddleMouseUp:
 				lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.MIDDLE);
 			case RightClick:
 				lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.RIGHT);
-				Timer.delay(function() {
-					lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.RIGHT);
-				}, 20);
+				lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.RIGHT);
 			case RightMouseDown:
 				lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.RIGHT);
 			case RightMouseUp:
