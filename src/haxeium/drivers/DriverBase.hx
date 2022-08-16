@@ -5,8 +5,12 @@ import haxe.Json;
 import haxe.Timer;
 import haxe.extern.EitherType;
 import haxe.io.Bytes;
+import haxe.ui.containers.menus.Menu.MenuEvent;
 import hx.ws.Types.MessageType;
 import hx.ws.WebSocket;
+#if sys
+import sys.thread.Mutex;
+#end
 
 class DriverBase<T> {
 	var socket:WebSocket;
@@ -15,12 +19,18 @@ class DriverBase<T> {
 	var url:String;
 	var intervalMs:Int;
 	var mainThreadAction:Null<MainThreadAction>;
+	#if sys
+	var mainThreadMutex:Mutex;
+	#end
 
 	public function new(url:String, intervalMs:Int = 100) {
 		components = [];
 		this.url = url;
 		this.intervalMs = intervalMs;
 		mainThreadAction = null;
+		#if sys
+		mainThreadMutex = new Mutex();
+		#end
 		Timer.delay(function() {
 			start();
 		}, 500);
@@ -28,23 +38,39 @@ class DriverBase<T> {
 	}
 
 	function pollCommands() {
-		if (mainThreadAction != null) {
-			mainThreadAction();
-			mainThreadAction = null;
+		#if sys
+		mainThreadMutex.acquire();
+		#end
+		try {
+			if (mainThreadAction != null) {
+				mainThreadAction();
+				mainThreadAction = null;
+			}
+		} catch (e:Exception) {
+			trace(e);
 		}
+		#if sys
+		mainThreadMutex.release();
+		#end
 		Timer.delay(pollCommands, intervalMs);
 	}
 
 	function runInMainThread(action:MainThreadAction) {
-		mainThreadAction = action;
 		#if sys
+		mainThreadMutex.acquire();
+		mainThreadAction = action;
+		mainThreadMutex.release();
 		while (true) {
+			mainThreadMutex.acquire();
 			if (mainThreadAction == null) {
+				mainThreadMutex.release();
 				break;
 			}
+			mainThreadMutex.release();
 			Sys.sleep(0.01);
 		}
 		#else
+		mainThreadAction = action;
 		mainThreadAction();
 		mainThreadAction = null;
 		#end
