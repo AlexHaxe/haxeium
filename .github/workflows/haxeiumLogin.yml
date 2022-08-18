@@ -21,10 +21,10 @@ jobs:
       run: git config --global core.autocrlf false
     - name: Checkout Haxeium sources
       uses: actions/checkout@v1
-    - name: Use Node.js 16
+    - name: Use Node.js 14
       uses: actions/setup-node@v1
       with:
-        node-version: 16
+        node-version: 14
     - name: Run npm install
       run: npm ci
     - name: Install Haxe version ${{ matrix.haxe-version }}
