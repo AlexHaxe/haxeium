@@ -362,6 +362,8 @@ class HaxeUIDriver extends DriverBase<Component> {
 					#end
 			}
 		}
+		virtualX = -1;
+		virtualY = -1;
 		return success();
 	}
 

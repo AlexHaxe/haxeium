@@ -277,7 +277,7 @@ class AppDriver {
 		return result;
 	}
 
-	public static function locatorToText(locator:Null<ElementLocator>) {
+	public function locatorToText(locator:Null<ElementLocator>) {
 		if (locator == null) {
 			return "null";
 		}

@@ -38,7 +38,7 @@ jobs:
         npx haxe -version
         npx neko -version
         npx haxelib list
-    - name: Build Login App (C++)
+    - name: Setup Login Sample App
       run: |
         cd samples/haxeui/login
         npx lix download
@@ -46,12 +46,15 @@ jobs:
         npx lix use haxe ${{ matrix.haxe-version }}
         npx lix install haxelib:lime-samples
         echo "y" | npx haxelib run lime setup
+    - name: Build Login Sample App (C++)
+      run: |
+        cd samples/haxeui/login
         npx lime build linux
-    - name: Build Login App (HTML5)
+    - name: Build Login Sample App (HTML5)
       run: |
         cd samples/haxeui/login
         npx lime build html5
-    - name: Build Login tests
+    - name: Build Login Sample tests
       run: |
         cd samples/haxeui/login
         npx haxe build.hxml
