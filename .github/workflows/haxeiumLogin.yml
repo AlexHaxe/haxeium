@@ -42,8 +42,11 @@ jobs:
       run: |
         cd samples/haxeui/login
         npx lix download
+        npx lix download haxe ${{ matrix.haxe-version }}
+        npx lix use haxe ${{ matrix.haxe-version }}
         npx lix install haxelib:lime-samples
-        npx haxelib run lime setup linux
+        # npx haxelib run lime setup linux
+        echo "y" | npx haxelib run lime setup
         npx lime build linux
     - name: Build Login tests
       run: |
