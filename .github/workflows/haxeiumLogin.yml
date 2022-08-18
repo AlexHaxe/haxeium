@@ -12,7 +12,7 @@ jobs:
   build:
     strategy:
       matrix:
-        haxe-version: ['4.2.5', 'nightly']
+        haxe-version: ['4.1.5', '4.2.5', 'nightly']
         platform: [ubuntu-latest]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -21,10 +21,10 @@ jobs:
       run: git config --global core.autocrlf false
     - name: Checkout Haxeium sources
       uses: actions/checkout@v1
-    - name: Use Node.js 10
+    - name: Use Node.js 16
       uses: actions/setup-node@v1
       with:
-        node-version: 10
+        node-version: 16
     - name: Run npm install
       run: npm ci
     - name: Install Haxe version ${{ matrix.haxe-version }}
@@ -38,21 +38,24 @@ jobs:
         npx haxe -version
         npx neko -version
         npx haxelib list
-    - name: Build Login App
+    - name: Build Login App (C++)
       run: |
         cd samples/haxeui/login
         npx lix download
         npx lix download haxe ${{ matrix.haxe-version }}
         npx lix use haxe ${{ matrix.haxe-version }}
         npx lix install haxelib:lime-samples
-        # npx haxelib run lime setup linux
         echo "y" | npx haxelib run lime setup
         npx lime build linux
+     - name: Build Login App (HTML5)
+      run: |
+        cd samples/haxeui/login
+        npx lime build html5
     - name: Build Login tests
       run: |
         cd samples/haxeui/login
         npx haxe build.hxml
-    - name: Build Login tests
-      run: |
-        cd samples/haxeui/login
-        bin/TestMain
+    # - name: Run Login tests
+    #   run: |
+    #     cd samples/haxeui/login
+    #     bin/TestMain
