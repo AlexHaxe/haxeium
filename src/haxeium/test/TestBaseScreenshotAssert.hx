@@ -19,7 +19,7 @@ class TestBaseScreenshotAssert implements ITest {
 	}
 
 	function grabFailScreenshot(?pos:PosInfos) {
-		grabScreenshot("_fail");
+		grabScreenshot("_fail", pos);
 	}
 
 	public function isTrue(cond:Bool, ?msg:String, ?pos:PosInfos):Bool {

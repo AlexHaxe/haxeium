@@ -12,7 +12,6 @@ import haxe.ui.events.MouseEvent;
 import haxe.ui.styles.elements.RuleElement;
 import hx.ws.Types.MessageType;
 import hx.ws.WebSocket;
-import openfl.events.Event;
 import haxeium.drivers.events.LimeDispatchHelper;
 
 class HaxeUIDriver extends DriverBase<Component> {
@@ -176,7 +175,12 @@ class HaxeUIDriver extends DriverBase<Component> {
 		var x:Null<Float> = command.x;
 		var y:Null<Float> = command.y;
 
-		if (command.x == null || command.y == null) {
+		if (command.x == null && command.y == null && command.locator == null) {
+			x = virtualX;
+			y = virtualY;
+		}
+
+		if (command.locator != null) {
 			component = cast findComponent(LocatorHelper.elementToByLocator(command.locator));
 			if (component == null) {
 				return notFound(command.locator);
@@ -189,6 +193,10 @@ class HaxeUIDriver extends DriverBase<Component> {
 			}
 			x = component.screenLeft + component.width / 2;
 			y = component.screenTop + component.height / 2;
+			if ((command.x != null) && (command.y != null)) {
+				x += command.x;
+				y += command.y;
+			}
 			if (isComponentInteractive(component)) {
 				// if we are sending a mouse event to an interactive component, then it should be the one found through findInteractiveComponent
 				var componentUnderPoint = findInteractiveComponent(x, y);
@@ -200,11 +208,49 @@ class HaxeUIDriver extends DriverBase<Component> {
 				}
 			}
 		}
+		switch (command.eventName) {
+			case MoveTo:
+				virtualX = x;
+				virtualY = y;
+				return success(command.locator);
+			case MoveByOffset:
+				virtualX += x;
+				virtualY += y;
+				return success(command.locator);
+			default:
+		}
+		switch (command.eventName) {
+			case Click:
+				removeInputDown(LeftMouse);
+			case DoubleClick:
+				removeInputDown(LeftMouse);
+			case MouseDown:
+				addInputDown(LeftMouse);
+			case MouseUp:
+				removeInputDown(LeftMouse);
+			case MouseWheel:
+			case MiddleClick:
+				removeInputDown(MiddleMouse);
+			case MiddleMouseDown:
+				addInputDown(MiddleMouse);
+			case MiddleMouseUp:
+				removeInputDown(MiddleMouse);
+			case RightClick:
+				removeInputDown(RightMouse);
+			case RightMouseDown:
+				addInputDown(RightMouse);
+			case RightMouseUp:
+				removeInputDown(RightMouse);
+			case MoveTo | MoveByOffset:
+		}
+
 		try {
 			#if lime
 			runInMainThread(function() {
 				LimeDispatchHelper.dispatchMouseEvent(command, x, y);
 			});
+			virtualX = x;
+			virtualY = y;
 			return success(command.locator);
 			#end
 		} catch (e:Exception) {
@@ -246,6 +292,15 @@ class HaxeUIDriver extends DriverBase<Component> {
 	}
 
 	override function doKeyboardEvent(command:CommandKeyboardEvent):ResultBase {
+		if (command.keyCode != null) {
+			switch (command.eventName) {
+				case KeyPress:
+				case KeyDown:
+					addInputDown(KeyCode(command.keyCode));
+				case KeyUp:
+					removeInputDown(KeyCode(command.keyCode));
+			}
+		}
 		try {
 			#if lime
 			runInMainThread(function() {
@@ -269,6 +324,45 @@ class HaxeUIDriver extends DriverBase<Component> {
 			result.className = component.className;
 		}
 		return result;
+	}
+
+	override function doResetInputs():ResultBase {
+		for (down in inputsDown) {
+			switch (down) {
+				case LeftMouse:
+					#if lime
+					runInMainThread(function() {
+						LimeDispatchHelper.dispatchMouseEvent({command: MouseEvent, eventName: MouseUp}, -1, -1);
+					});
+					#end
+				case RightMouse:
+					#if lime
+					runInMainThread(function() {
+						LimeDispatchHelper.dispatchMouseEvent({command: MouseEvent, eventName: RightMouseUp}, -1, -1);
+					});
+					#end
+				case MiddleMouse:
+					#if lime
+					runInMainThread(function() {
+						LimeDispatchHelper.dispatchMouseEvent({command: MouseEvent, eventName: MiddleMouseUp}, -1, -1);
+					});
+					#end
+				case KeyCode(keyCode):
+					#if lime
+					runInMainThread(function() {
+						LimeDispatchHelper.dispatchKeyboardEvent({
+							command: KeyboardEvent,
+							eventName: KeyUp,
+							keyCode: keyCode,
+							altKey: false,
+							ctrlKey: false,
+							shiftKey: false
+						});
+					});
+					#end
+			}
+		}
+		return success();
 	}
 
 	override function findComponent(locator:ByLocator, ?parent:ByLocator):Component {

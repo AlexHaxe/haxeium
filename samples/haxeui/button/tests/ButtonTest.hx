@@ -1,6 +1,5 @@
-import haxeium.AppDriver;
+import haxeium.Actions;
 import haxeium.Wait;
-import haxeium.commands.LocatorType;
 import haxeium.test.TestBaseAllRestarts;
 
 class ButtonTest extends TestBaseAllRestarts {
@@ -29,8 +28,8 @@ class ButtonTest extends TestBaseAllRestarts {
 		var buttons = driver.findElements(ByCssClass("button"));
 		isTrue(buttons.length > 0);
 		for (button in buttons) {
-			// trace(button.text);
-			button.click();
+			// click with random +/- 2.5 pixels offset from center of button
+			new Actions().click(button, Math.random() * 5 - 2.5, Math.random() * 5 - 2.5).perform();
 		}
 		Wait.untilPropertyEqualsValue(button1.locator, "text", "Thanks!");
 		equals("Thanks!", button1.text);

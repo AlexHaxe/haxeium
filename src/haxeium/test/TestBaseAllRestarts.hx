@@ -1,16 +1,12 @@
 package haxeium.test;
 
-import utest.Assert;
-import utest.ITest;
-
-class TestBaseAllRestarts  extends TestBaseScreenshotAssert {
-
+class TestBaseAllRestarts extends TestBaseScreenshotAssert {
 	function setup() {
 		driver.startApp();
 	}
 
 	function teardown() {
+		driver.resetInputState();
 		driver.stopApp();
 	}
-
 }

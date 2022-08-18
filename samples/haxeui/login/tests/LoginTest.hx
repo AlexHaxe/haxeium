@@ -1,3 +1,4 @@
+import haxeium.Actions;
 import haxeium.Wait;
 import haxeium.commands.ResultStatusHandler;
 import haxeium.test.TestBaseAllRestarts;
@@ -61,8 +62,7 @@ class LoginTest extends TestBaseAllRestarts {
 		Wait.untilElementBecomesAvailable(ByClassName("LoginDialog"));
 		Wait.untilElementBecomesAvailable(ById("username"));
 		var username = driver.findElement(ById("username"));
-		username.click();
-		username.keyPress("admin");
+		new Actions().click(username).sendKeys("admin").perform();
 		equals("admin", username.text);
 		var loginBtn = driver.findElement(ById("login"));
 		loginBtn.click();
@@ -87,15 +87,14 @@ class LoginTest extends TestBaseAllRestarts {
 
 		Wait.untilElementBecomesAvailable(ByClassName("LoginDialog"));
 		var username = driver.findElement(ById("username"));
-		username.click();
+		new Actions().click(username).sendKeys("admin").perform();
+
 		isTrue(username.getProp("focus"));
-		username.keyPress("admin");
 		equals("admin", username.text);
 		var password = driver.findElement(ById("password"));
-		password.click();
+		new Actions().click(password).sendKeys("password").perform();
 		isTrue(password.getProp("focus"));
-		password.keyPress("admin");
-		equals("admin", password.text);
+		equals("password", password.text);
 		var loginBtn = driver.findElement(ById("login"));
 		loginBtn.click();
 
@@ -106,7 +105,7 @@ class LoginTest extends TestBaseAllRestarts {
 		isNull(messageBox);
 	}
 
-	public function testSubmitUserMistypeAndPassword() {
+	public function testSubmitUserAndPasswordMistype() {
 		var button = driver.findElement(ById("loginButton"));
 		equals("Login", button.text);
 		button.click();
@@ -114,19 +113,15 @@ class LoginTest extends TestBaseAllRestarts {
 		Wait.untilElementBecomesAvailable(ByClassName("LoginDialog"));
 		Wait.untilInteractiveElementBecomesAvailable(ById("username"));
 		var username = driver.findElement(ById("username"));
-		username.click();
+		new Actions().click(username).sendKeys("adminn").keyDown(8).perform();
 		isTrue(username.getProp("focus"));
-		username.keyPress("adminn");
-		username.click();
-		username.keyDown(8);
 
 		var password = driver.findElement(ById("password"));
-		password.click();
+		new Actions().click(password).sendKeys("passwordd").keyDown(8).perform();
 		isTrue(password.getProp("focus"));
-		password.keyPress("admin");
 
 		equals("admin", username.text);
-		equals("admin", password.text);
+		equals("password", password.text);
 
 		var loginBtn = driver.findElement(ById("login"));
 		loginBtn.click();

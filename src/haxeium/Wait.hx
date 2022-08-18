@@ -1,14 +1,14 @@
 package haxeium;
 
 import haxe.Exception;
+import haxe.PosInfos;
 import haxe.Timer;
-import haxe.ds.Either;
 import haxeium.AppDriver;
 import haxeium.commands.ElementLocator;
 import haxeium.elements.Element;
 
 class Wait {
-	public static function untilElementBecomesAvailable(locator:Null<ByLocator> = null, element:Null<Element> = null) {
+	public static function untilElementBecomesAvailable(locator:Null<ByLocator> = null, element:Null<Element> = null, ?pos:PosInfos) {
 		if (element != null) {
 			locator = element.locator;
 		}
@@ -17,10 +17,10 @@ class Wait {
 		}
 		until(function() {
 			return AppDriver.instance.findElement(locator, waitForAllResults) != null;
-		});
+		}, pos);
 	}
 
-	public static function untilElementBecomesUnavailable(locator:Null<ByLocator> = null, element:Null<Element> = null) {
+	public static function untilElementBecomesUnavailable(locator:Null<ByLocator> = null, element:Null<Element> = null, ?pos:PosInfos) {
 		if (element != null) {
 			locator = element.locator;
 		}
@@ -29,10 +29,10 @@ class Wait {
 		}
 		until(function() {
 			return AppDriver.instance.findElement(locator, waitForAllResults) == null;
-		});
+		}, pos);
 	}
 
-	public static function untilInteractiveElementBecomesAvailable(locator:Null<ByLocator> = null, element:Null<Element> = null) {
+	public static function untilInteractiveElementBecomesAvailable(locator:Null<ByLocator> = null, element:Null<Element> = null, ?pos:PosInfos) {
 		if (element != null) {
 			locator = element.locator;
 		}
@@ -41,10 +41,10 @@ class Wait {
 		}
 		until(function() {
 			return AppDriver.instance.findInteractiveElement(locator, waitForAllResults) != null;
-		});
+		}, pos);
 	}
 
-	public static function untilElementBecomesVisible(locator:Null<ByLocator> = null, element:Null<Element> = null) {
+	public static function untilElementBecomesVisible(locator:Null<ByLocator> = null, element:Null<Element> = null, ?pos:PosInfos) {
 		if (element != null) {
 			locator = element.locator;
 		}
@@ -58,10 +58,11 @@ class Wait {
 			}
 			var hidden:Bool = cast element.getProp("hidden");
 			return !hidden;
-		});
+		}, pos);
 	}
 
-	public static function untilPropertyEqualsValue(locator:Null<ByLocator> = null, element:Null<Element> = null, name:String, expectedValue:Any) {
+	public static function untilPropertyEqualsValue(locator:Null<ByLocator> = null, element:Null<Element> = null, name:String, expectedValue:Any,
+			?pos:PosInfos) {
 		if (element != null) {
 			locator = element.locator;
 		}
@@ -76,10 +77,10 @@ class Wait {
 
 			var currentValue = element.getProp(name);
 			return currentValue == expectedValue;
-		});
+		}, pos);
 	}
 
-	public static function until(waitFunc:() -> Bool, waitTime:Float = 0.1, retries:Int = 600) {
+	public static function until(waitFunc:() -> Bool, waitTime:Float = 0.1, retries:Int = 600, ?pos:PosInfos) {
 		var counter = 0;
 		while (counter++ < retries) {
 			var startStamp = Timer.stamp();
@@ -96,7 +97,7 @@ class Wait {
 		throw new WaitTimeoutException("wait timeout");
 	}
 
-	static function waitForAllResults(name:String, status:ResultStatus):Bool {
+	static function waitForAllResults(name:String, status:ResultStatus, ?pos:PosInfos):Bool {
 		return true;
 	}
 }

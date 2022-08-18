@@ -19,4 +19,6 @@ enum abstract MouseEventName(String) to String {
 	var RightClick = "rightclick";
 	var RightMouseDown = "rightmousedown";
 	var RightMouseUp = "rightmouseup";
+	var MoveTo = "moveto";
+	var MoveByOffset = "movebyoffset";
 }

@@ -15,6 +15,9 @@ import sys.thread.Mutex;
 class DriverBase<T> {
 	var socket:WebSocket;
 	var components:Array<T>;
+	var virtualX:Float;
+	var virtualY:Float;
+	var inputsDown:Array<InputDown>;
 
 	var url:String;
 	var intervalMs:Int;
@@ -25,6 +28,9 @@ class DriverBase<T> {
 
 	public function new(url:String, intervalMs:Int = 100) {
 		components = [];
+		virtualX = -1;
+		virtualY = -1;
+		inputsDown = [];
 		this.url = url;
 		this.intervalMs = intervalMs;
 		mainThreadAction = null;
@@ -140,6 +146,8 @@ class DriverBase<T> {
 			case Restart:
 				doRestart(command);
 				return null;
+			case ResetInput:
+				return doResetInputs();
 			case ScreenGrab:
 				return doScreenGrab(command);
 		}
@@ -157,31 +165,52 @@ class DriverBase<T> {
 
 	function doFindElement(command:CommandFindElement):ResultBase {
 		return null;
-	};
+	}
 
 	function doFindInteractiveElement(command:CommandFindElement):ResultBase {
 		return null;
-	};
+	}
 
 	function doFindElements(command:CommandFindElements):ResultBase {
 		return null;
-	};
+	}
 
 	function doFindElementsUnderPoint(command:CommandFindElementsUnderPoint):ResultBase {
 		return null;
-	};
+	}
 
 	function doFindChildren(command:CommandFindChildren):ResultBase {
 		return null;
-	};
+	}
 
 	function doMouseEvent(command:CommandMouseEvent):ResultBase {
 		return null;
-	};
+	}
 
 	function doKeyboardEvent(command:CommandKeyboardEvent):ResultBase {
 		return null;
-	};
+	}
+
+	function doResetInputs():ResultBase {
+		return null;
+	}
+
+	function addInputDown(inputDown:InputDown) {
+		for (down in inputsDown) {
+			if ('$down' == '$inputDown') {
+				return;
+			}
+		}
+		inputsDown.push(inputDown);
+	}
+
+	function removeInputDown(inputDown:InputDown) {
+		for (down in inputsDown) {
+			if ('$down' == '$inputDown') {
+				inputsDown.remove(down);
+			}
+		}
+	}
 
 	function doScreenGrab(command:CommandBase):EitherType<ResultBase, Bytes> {
 		#if openfl
@@ -276,3 +305,10 @@ class DriverBase<T> {
 }
 
 typedef MainThreadAction = () -> Void;
+
+enum InputDown {
+	LeftMouse;
+	RightMouse;
+	MiddleMouse;
+	KeyCode(keyCode:Int);
+}

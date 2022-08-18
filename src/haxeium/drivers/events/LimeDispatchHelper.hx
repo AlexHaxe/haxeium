@@ -33,6 +33,7 @@ class LimeDispatchHelper {
 				lime.app.Application.current.window.onMouseDown.dispatch(x, y, lime.ui.MouseButton.RIGHT);
 			case RightMouseUp:
 				lime.app.Application.current.window.onMouseUp.dispatch(x, y, lime.ui.MouseButton.RIGHT);
+			case MoveTo | MoveByOffset:
 		}
 	}
 

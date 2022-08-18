@@ -11,5 +11,6 @@ enum abstract Command(String) {
 	var PropGet = "propGet";
 	var PropSet = "propSet";
 	var Restart = "restart";
+	var ResetInput = "resetInput";
 	var ScreenGrab = "screenGrab";
 }

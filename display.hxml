@@ -4,4 +4,4 @@
 -lib hxWebSockets
 -lib utest
 
--js out.js
+--cpp out

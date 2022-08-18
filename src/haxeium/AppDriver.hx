@@ -1,9 +1,10 @@
 package haxeium;
 
 import haxe.Json;
-import haxe.MainLoop;
 import haxe.extern.EitherType;
 import haxe.io.Bytes;
+import haxe.io.Path;
+import sys.FileSystem;
 import sys.io.File;
 import sys.thread.Thread;
 import hx.ws.SocketImpl;
@@ -11,7 +12,7 @@ import hx.ws.Types.MessageType;
 import hx.ws.WebSocketHandler;
 import hx.ws.WebSocketServer;
 import utest.Assert;
-import haxeium.commands.ResultStatusHandler;
+import haxeium.commands.CommandResetInput;
 import haxeium.commands.ResultStatusHandler;
 import haxeium.elements.DropDownElement;
 import haxeium.elements.Element;
@@ -24,6 +25,7 @@ class AppDriver {
 	public static var instance(default, null):AppDriver;
 
 	public var connected(default, null):Bool;
+	public var screenshotFolder:String;
 
 	var server:WebSocketServer<AppSocketHandler>;
 	var handler:AppSocketHandler;
@@ -43,6 +45,7 @@ class AppDriver {
 		}
 		instance = this;
 		connected = false;
+		screenshotFolder = "screenshots";
 
 		server = new WebSocketServer<AppSocketHandler>(host, port, 1);
 		server.start();
@@ -166,7 +169,23 @@ class AppDriver {
 		if (result == null) {
 			return false;
 		}
-		File.saveBytes(fileName, result);
+		if (!FileSystem.exists(screenshotFolder)) {
+			FileSystem.createDirectory(screenshotFolder);
+		}
+		File.saveBytes(Path.join([screenshotFolder, fileName]), result);
+		return true;
+	}
+
+	public function resetInputState():Bool {
+		var command:CommandResetInput = {command: ResetInput};
+
+		var result:ResultBase = cast send(command);
+		if (result == null) {
+			return false;
+		}
+		if (result.status != Success) {
+			return false;
+		}
 		return true;
 	}
 
@@ -324,6 +343,10 @@ class AppDriver {
 						'rightMouseDown(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
 					case RightMouseUp:
 						'rightMouseUp(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
+					case MoveTo:
+						'moveTo(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
+					case MoveByOffset:
+						'moveByOffset(${locatorToText(cmdMouse.locator)}, x=${cmdMouse.x}, y=${cmdMouse.y})';
 				}
 			case PropGet:
 				'propGet(${locatorToText(cmdLocator.locator)})';
@@ -331,6 +354,8 @@ class AppDriver {
 				'propSet(${locatorToText(cmdLocator.locator)})';
 			case Restart:
 				"restart";
+			case ResetInput:
+				"resetInput";
 			case ScreenGrab:
 				"screenGrab";
 		}
