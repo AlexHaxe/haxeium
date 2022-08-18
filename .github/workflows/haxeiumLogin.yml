@@ -42,6 +42,7 @@ jobs:
       run: |
         cd samples/haxeui/login
         npx lix download
+        npx haxelib run lime setup
         npx lime build linux
     - name: Build Login tests
       run: |
