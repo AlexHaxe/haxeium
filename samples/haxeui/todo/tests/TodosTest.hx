@@ -92,9 +92,8 @@ class TodosTest extends TestBaseAllRestarts {
 		Sys.sleep(0.1);
 		equals("9 items left", activeCountLabel.text);
 
-		var clearCompletedLink = driver.findElement(ById("clearCompletedLink"));
-		clearCompletedLink.click();
-		Sys.sleep(0.1);
+		clearDone();
+
 		var checkboxes = todoList.findElements(ByCssClass("checkbox"));
 		equals(9, checkboxes.length);
 	}
@@ -123,9 +122,8 @@ class TodosTest extends TestBaseAllRestarts {
 			}
 		}
 
-		var clearCompletedLink = driver.findElement(ById("clearCompletedLink"));
-		clearCompletedLink.click();
-		Sys.sleep(0.1);
+		clearDone();
+
 		var checkboxes = todoList.findElements(ByCssClass("checkbox"));
 		equals(0, checkboxes.length);
 	}
@@ -177,7 +175,18 @@ class TodosTest extends TestBaseAllRestarts {
 
 		var clearCompletedLink = driver.findElement(ById("clearCompletedLink"));
 		clearCompletedLink.click(ResultStatusHelper.expectNotVisibleResult);
+
 		var buttons = todoList.findElements(ByCssClass("button"));
 		equals(0, buttons.length);
+	}
+
+	function clearDone() {
+		var scrollView = driver.findElement(ById("mainScrollView"));
+		scrollView.setProp("vscrollPos", scrollView.getProp("vscrollMax"));
+		Sys.sleep(0.1);
+
+		var clearCompletedLink = driver.findElement(ById("clearCompletedLink"));
+		clearCompletedLink.click();
+		Sys.sleep(0.1);
 	}
 }
