@@ -9,7 +9,7 @@ class ResultStatusHelper {
 		if (status == Success) {
 			return true;
 		}
-		utest.Assert.fail('$name failed with $status');
+		utest.Assert.fail('$name failed with $status', pos);
 		grabFailScreenshot(pos);
 		return false;
 	}
@@ -18,7 +18,7 @@ class ResultStatusHelper {
 		if (status == FailedNotVisible) {
 			return true;
 		}
-		utest.Assert.fail('$name failed with $status');
+		utest.Assert.fail('$name failed with $status', pos);
 		grabFailScreenshot(pos);
 		return false;
 	}
@@ -27,7 +27,7 @@ class ResultStatusHelper {
 		if (status == FailedNotFound) {
 			return true;
 		}
-		utest.Assert.fail('$name failed with $status');
+		utest.Assert.fail('$name failed with $status', pos);
 		grabFailScreenshot(pos);
 		return false;
 	}

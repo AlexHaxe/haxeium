@@ -1,0 +1,5 @@
+# @install: lix --silent download "gh://github.com/haxeui/haxeui-openfl#f1307d78d2841e61de63abb2a4e24ca0b458ba00" into haxeui-openfl/1.4.0/github/f1307d78d2841e61de63abb2a4e24ca0b458ba00
+-lib haxeui-core
+-lib openfl
+-cp ${HAXE_LIBCACHE}/haxeui-openfl/1.4.0/github/f1307d78d2841e61de63abb2a4e24ca0b458ba00/
+-D haxeui-openfl=1.4.0

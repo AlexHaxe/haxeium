@@ -1,0 +1,34 @@
+<vbox width="100%" height="100%">
+    <style source="todos.css" />
+    <scrollview id="mainScrollView" width="100%" height="100%" contentWidth="100%">
+        <label text="todos" horizontalAlign="center" style="color: #e4d0cf;font-size: 96px;" />
+        <vbox id="todoFrame" width="550" horizontalAlign="center" style="spacing:0;">
+            <vbox id="todoContainer" width="100%" horizontalAlign="center">
+                <hbox width="100%" style="padding: 10px;">
+                    <spacer width="40" />
+                    <textfield id="todoItem" width="100%" placeholder="What needs to be done?" style="font-size: 24px;font-style:italic;" />
+                </hbox>
+                <listview id="todoList" width="100%" hidden="true">
+                    <item-renderer layoutName="horizontal" width="100%" style="padding: 10px;spacing:10px;">
+                        <checkbox id="completed" verticalAlign="center" />
+                        <textfield id="label" width="100%" verticalAlign="center" style="font-size: 24px" />
+                        <button id="delete" icon="assets/delete.png" tooltip="Remove" verticalAlign="center" />
+                    </item-renderer>
+                </listview>
+                <box id="optionsContainer" width="100%" style="padding: 10px;" hidden="true">
+                    <label id="activeCountLabel" text="" verticalAlign="center" />
+                    <button-bar id="optionsButtonBar" selectedIndex="0" horizontalAlign="center">
+                        <button text="All" />
+                        <button text="Active" />
+                        <button text="Completed" />
+                    </button-bar>
+                    <link id="clearCompletedLink" text="Clear Completed" verticalAlign="center" horizontalAlign="right" />
+                </box>
+            </vbox>
+            <vbox width="100%" id="pageBottom" style="spacing:0;" hidden="true">
+                <box width="98%" height="5" styleName="page-bottom" horizontalAlign="center" />
+                <box width="96%" height="5" styleName="page-bottom" horizontalAlign="center" />
+            </vbox>
+        </vbox>
+    </scrollview>
+</vbox>

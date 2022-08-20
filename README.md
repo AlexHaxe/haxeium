@@ -1,4 +1,4 @@
-# Haxium an automated UI testing framework (WIP)
+# Haxium an automated UI testing framework
 
 framework consists of two parts:
 
