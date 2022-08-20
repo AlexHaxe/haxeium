@@ -88,11 +88,19 @@ class TodosTest extends TestBaseAllRestarts {
 		var todoList = driver.findElement(ById("todoList"));
 		var checkboxes = todoList.findElements(ByCssClass("checkbox"));
 		equals(10, checkboxes.length);
-		checkboxes[5].click();
-		Sys.sleep(0.1);
+		new Actions().scrollToElement(checkboxes[5])
+			.pause(0.2)
+			.click(checkboxes[5])
+			.pause(0.1)
+			.perform();
 		equals("9 items left", activeCountLabel.text);
 
-		clearDone();
+		var clearCompletedLink = driver.findElement(ById("clearCompletedLink"));
+		new Actions().scrollToElement(clearCompletedLink)
+			.pause(0.1)
+			.click(clearCompletedLink)
+			.pause(0.1)
+			.perform();
 
 		var checkboxes = todoList.findElements(ByCssClass("checkbox"));
 		equals(9, checkboxes.length);
@@ -112,8 +120,7 @@ class TodosTest extends TestBaseAllRestarts {
 		equals(10, checkboxes.length);
 		var i = 10;
 		for (checkbox in checkboxes) {
-			checkbox.click();
-			Sys.sleep(0.1);
+			new Actions().scrollToElement(checkbox).pause(0.2).click(checkbox).pause(0.1).perform();
 			i--;
 			if (i == 1) {
 				equals('1 item left', activeCountLabel.text);
@@ -122,7 +129,12 @@ class TodosTest extends TestBaseAllRestarts {
 			}
 		}
 
-		clearDone();
+		var clearCompletedLink = driver.findElement(ById("clearCompletedLink"));
+		new Actions().scrollToElement(clearCompletedLink)
+			.pause(0.1)
+			.click(clearCompletedLink)
+			.pause(0.1)
+			.perform();
 
 		var checkboxes = todoList.findElements(ByCssClass("checkbox"));
 		equals(0, checkboxes.length);
@@ -140,8 +152,7 @@ class TodosTest extends TestBaseAllRestarts {
 		var todoList = driver.findElement(ById("todoList"));
 		var buttons = todoList.findElements(ByCssClass("button"));
 		equals(10, buttons.length);
-		buttons[5].click();
-		Sys.sleep(0.1);
+		new Actions().scrollToElement(buttons[5]).pause(0.2).click(buttons[5]).pause(0.1).perform();
 		equals("9 items left", activeCountLabel.text);
 
 		var clearCompletedLink = driver.findElement(ById("clearCompletedLink"));
@@ -163,7 +174,7 @@ class TodosTest extends TestBaseAllRestarts {
 		var i = 10;
 		while (i > 0) {
 			var button = todoList.findElement(ByCssClass("button"));
-			button.click();
+			new Actions().scrollToElement(button).pause(0.2).click(button).pause(0.1).perform();
 			Sys.sleep(0.1);
 			i--;
 			if (i == 1) {
@@ -178,15 +189,5 @@ class TodosTest extends TestBaseAllRestarts {
 
 		var buttons = todoList.findElements(ByCssClass("button"));
 		equals(0, buttons.length);
-	}
-
-	function clearDone() {
-		var scrollView = driver.findElement(ById("mainScrollView"));
-		scrollView.setProp("vscrollPos", scrollView.getProp("vscrollMax"));
-		Sys.sleep(0.1);
-
-		var clearCompletedLink = driver.findElement(ById("clearCompletedLink"));
-		clearCompletedLink.click();
-		Sys.sleep(0.1);
 	}
 }

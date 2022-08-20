@@ -4,6 +4,7 @@ import haxe.Exception;
 import haxe.Json;
 import haxe.Timer;
 import haxe.ui.components.TextField;
+import haxe.ui.containers.ScrollView;
 import haxe.ui.core.Component;
 import haxe.ui.core.InteractiveComponent;
 import haxe.ui.core.Screen;
@@ -365,6 +366,32 @@ class HaxeUIDriver extends DriverBase<Component> {
 		virtualX = -1;
 		virtualY = -1;
 		return success();
+	}
+
+	override function doScrollToElement(command:CommandScrollToElement):ResultBase {
+		var component = findComponent(LocatorHelper.elementToByLocator(command.locator));
+		if (component == null) {
+			return notFound(command.locator);
+		}
+		var parent = component.parentComponent;
+		if (parent == null) {
+			return notFound(command.locator);
+		}
+		var found = false;
+		while (parent != null) {
+			if ((parent is ScrollView)) {
+				var scrollView:ScrollView = cast parent;
+				runInMainThread(function() {
+					scrollView.ensureVisible(component);
+				});
+				found = true;
+			}
+			parent = parent.parentComponent;
+		}
+		if (found) {
+			return success(command.locator);
+		}
+		return notFound(command.locator);
 	}
 
 	override function findComponent(locator:ByLocator, ?parent:ByLocator):Component {

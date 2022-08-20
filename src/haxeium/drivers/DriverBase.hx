@@ -150,6 +150,8 @@ class DriverBase<T> {
 				return doResetInputs();
 			case ScreenGrab:
 				return doScreenGrab(command);
+			case ScrollToElement:
+				return doScrollToElement(cast command);
 		}
 		return notFound();
 	}
@@ -192,6 +194,10 @@ class DriverBase<T> {
 	}
 
 	function doResetInputs():ResultBase {
+		return null;
+	}
+
+	function doScrollToElement(command:CommandScrollToElement):ResultBase {
 		return null;
 	}
 

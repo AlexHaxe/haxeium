@@ -13,4 +13,5 @@ enum abstract Command(String) {
 	var Restart = "restart";
 	var ResetInput = "resetInput";
 	var ScreenGrab = "screenGrab";
+	var ScrollToElement = "scrollToElement";
 }

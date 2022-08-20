@@ -61,6 +61,11 @@ class Actions {
 		return this;
 	}
 
+	public function scrollToElement(element:Element):Actions {
+		actions.push(ScrollToElement(element));
+		return this;
+	}
+
 	public function pause(s:Float):Actions {
 		actions.push(Pause(s));
 		return this;
@@ -95,6 +100,8 @@ class Actions {
 					performKeyboardEvent(KeyUp, null, keyCode, altKey, ctrlKey, shiftKey);
 				case SendKeys(text):
 					performKeyboardEvent(KeyPress, text);
+				case ScrollToElement(element):
+					performScrollToElement(LocatorHelper.byToElementLocator(element.locator));
 				case Pause(s):
 					Sys.sleep(s);
 					true;
@@ -144,6 +151,21 @@ class Actions {
 		}
 		return true;
 	}
+
+	function performScrollToElement(locator:ElementLocator) {
+		var cmd:CommandScrollToElement = {
+			command: ScrollToElement,
+			locator: locator
+		};
+		var result:ResultBase = AppDriver.instance.send(cmd);
+		if (result == null) {
+			return false;
+		}
+		if (result.status != Success) {
+			return false;
+		}
+		return true;
+	}
 }
 
 enum InputAction {
@@ -157,6 +179,6 @@ enum InputAction {
 	KeyDown(keyCode:Int, ?altKey:Bool, ?ctrlKey:Bool, ?shiftKey:Bool);
 	KeyUp(keyCode:Int, ?altKey:Bool, ?ctrlKey:Bool, ?shiftKey:Bool);
 	SendKeys(text:String);
-
+	ScrollToElement(element:Element);
 	Pause(s:Float);
 }

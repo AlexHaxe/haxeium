@@ -75,7 +75,6 @@ class TodosView extends VBox {
 		var i = todoData.size;
 		while (--i >= 0) {
 			var item = todoData.get(i);
-			trace(item);
 			if (item.completed) {
 				todoData.remove(item);
 			}

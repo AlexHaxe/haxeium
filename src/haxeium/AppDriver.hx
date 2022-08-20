@@ -12,7 +12,6 @@ import hx.ws.Types.MessageType;
 import hx.ws.WebSocketHandler;
 import hx.ws.WebSocketServer;
 import utest.Assert;
-import haxeium.commands.CommandResetInput;
 import haxeium.commands.ResultStatusHandler;
 import haxeium.elements.DropDownElement;
 import haxeium.elements.Element;
@@ -174,6 +173,25 @@ class AppDriver {
 		}
 		File.saveBytes(Path.join([screenshotFolder, fileName]), result);
 		return true;
+	}
+
+	public function scrollToElement(locator:ByLocator, ?handler:ResultStatusHandler) {
+		var command:CommandScrollToElement = {
+			command: ScrollToElement,
+			locator: LocatorHelper.byToElementLocator(locator)
+		};
+
+		var result:ResultBase = cast send(command);
+		if (result == null) {
+			throw new NoSuchElementException(locator);
+		}
+		if (handler == null) {
+			handler = ResultStatusHelper.expectSuccessResult;
+		}
+		if (!handler("scrollToElement", result.status)) {
+			throw new NoSuchElementException(locator);
+		}
+		return;
 	}
 
 	public function resetInputState():Bool {
@@ -358,6 +376,8 @@ class AppDriver {
 				"resetInput";
 			case ScreenGrab:
 				"screenGrab";
+			case ScrollToElement:
+				'scrollToElement(${locatorToText(cmdLocator.locator)})';
 		}
 		if (result != null) {
 			switch (result.status) {
